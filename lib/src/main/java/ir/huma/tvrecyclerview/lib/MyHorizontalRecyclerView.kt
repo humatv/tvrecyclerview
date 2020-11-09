@@ -222,8 +222,12 @@ class MyHorizontalRecyclerView : RecyclerView {
     }
 
     fun selectItem(pos: Int) {
+        selectItem(pos,false)
+    }
+
+    fun selectItem(pos: Int,focus : Boolean) {
         smoothScrollToPosition(pos)
-        doScroll(pos, false)
+        doScroll(pos, focus)
     }
 
 //
