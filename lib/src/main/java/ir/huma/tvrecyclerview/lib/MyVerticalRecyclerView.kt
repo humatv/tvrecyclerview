@@ -56,7 +56,7 @@ class MyVerticalRecyclerView : RecyclerView {
         }
 //        Log.d(MyHorizontalRecyclerView::class.java.name, "dispatchKeyEvent : ${event.toString()}")
         if (event?.action == KeyEvent.ACTION_DOWN) {
-            if (event?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+            if (event?.keyCode == KeyEvent.KEYCODE_DPAD_UP) {
                 if (selectedPos - rowCount >= 0) {
                     playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
                     smoothScrollToPosition(selectedPos - rowCount)
@@ -64,7 +64,7 @@ class MyVerticalRecyclerView : RecyclerView {
 //                    Log.d(MyHorizontalRecyclerView::class.java.name, "dpadRight")
                 }
                 return true
-            } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+            } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
                 if (selectedPos + rowCount < adapter!!.itemCount) {
                     playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
                     smoothScrollToPosition(selectedPos + rowCount)
@@ -72,14 +72,14 @@ class MyVerticalRecyclerView : RecyclerView {
 //                    Log.d(MyHorizontalRecyclerView::class.java.name, "dpadLeft")
                 }
                 return true
-            } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+            } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
                 if ((selectedPos + 1) % rowCount != 0 && selectedPos + 1 < adapter!!.itemCount) {
                     playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN)
                     doScroll(selectedPos + 1, true)
                     temp = true
                     return true
                 }
-            } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+            } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
                 if ((selectedPos - 1) % rowCount < rowCount - 1 && selectedPos - 1 >= 0) {
                     playSoundEffect(SoundEffectConstants.NAVIGATION_UP)
                     doScroll(selectedPos - 1, true)
