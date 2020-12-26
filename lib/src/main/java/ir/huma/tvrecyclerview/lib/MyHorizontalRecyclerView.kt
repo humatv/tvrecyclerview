@@ -13,6 +13,10 @@ import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ir.atitec.everythingmanager.adapter.recyclerview.BaseRVAdapter
+import ir.huma.tvrecyclerview.lib.listener.ItemSelectable
+import ir.huma.tvrecyclerview.lib.listener.OnItemClickListener
+import ir.huma.tvrecyclerview.lib.listener.OnItemLongClickListener
+import ir.huma.tvrecyclerview.lib.listener.OnItemSelectedListener
 
 class MyHorizontalRecyclerView : RecyclerView {
     var onItemClickListener: OnItemClickListener? = null
@@ -31,10 +35,8 @@ class MyHorizontalRecyclerView : RecyclerView {
             var layoutManager = CenterLayoutManager(context, field, GridLayoutManager.HORIZONTAL, false);
             layoutManager.setMillisecondPerInch(millisecondPerInch)
             super.setLayoutManager(layoutManager)
-//            setOnKeyListener(onkeyListener)
             super.setOnFocusChangeListener(focusChangeListener)
             super.addOnScrollListener(onMyScrollListener)
-//            addOnUnhandledKeyEventListener(unhandledKeyEventListener)
         }
 
     var onMyScrollListener = object : OnScrollListener() {
@@ -47,16 +49,6 @@ class MyHorizontalRecyclerView : RecyclerView {
         }
     }
 
-
-    //    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-//
-//        return super.onKeyDown(keyCode, event);
-//
-//
-////        var b =
-////        Log.d("recyclerView"," keydown rowCount ${rowCount} ${b}")
-////        return true
-//    }
     var longPress = false;
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
         if (myOnKeyListener != null && myOnKeyListener?.onKey(this, event?.keyCode!!, event)!!) {
@@ -143,16 +135,6 @@ class MyHorizontalRecyclerView : RecyclerView {
         return super.dispatchKeyEvent(event)
     }
 
-//    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-//        Log.d(MyHorizontalRecyclerView::class.java.name, "keyUp : "+event?.action)
-//
-//        if (temp) {
-//            temp = false;
-//            return true
-//        }
-//
-//        return super.onKeyUp(keyCode, event)
-//    }
 
     constructor(context: Context) : super(context) {
         initAnim()
@@ -177,14 +159,6 @@ class MyHorizontalRecyclerView : RecyclerView {
     }
 
     var temp = false;
-//    var onkeyListener = OnKeyListener { v, keyCode, event ->
-//        if (event?.action == KeyEvent.ACTION_DOWN) {
-//
-//        } else if (event?.action == KeyEvent.ACTION_UP) {
-//
-//        }
-//        false
-//    }
 
     override fun setOnFocusChangeListener(l: OnFocusChangeListener?) {
         myfocusChangeListener = l;
@@ -230,17 +204,6 @@ class MyHorizontalRecyclerView : RecyclerView {
         doScroll(pos, focus)
     }
 
-//
-//    var unhandledKeyEventListener = OnUnhandledKeyEventListener{ view: View, event: KeyEvent ->
-//        if(event?.action == KeyEvent.ACTION_UP){
-//            if(temp){
-//                temp = false;
-//                true
-//            }
-//        }
-//        false
-//    }
-
     fun doScroll(selectedPos: Int, focus: Boolean) {
         temp = true;
         if (adapter is BaseRVAdapter<*, *>) {
@@ -280,21 +243,4 @@ class MyHorizontalRecyclerView : RecyclerView {
         this.selectedPos = selectedPos;
     }
 
-
-    interface ItemSelectable {
-        fun changeSelected(isSelected: Boolean, focus: Boolean, pos: Int, obj: Any?)
-    }
-
-
-    interface OnItemSelectedListener {
-        fun onItemSelected(position: Int, obj: Any?, v: ViewHolder?, adapter: Adapter<*>?)
-    }
-
-    interface OnItemClickListener {
-        fun onItemClick(position: Int, obj: Any?, v: ViewHolder?, adapter: Adapter<*>?)
-    }
-
-    interface OnItemLongClickListener {
-        fun onItemLongClick(position: Int, obj: Any?, v: ViewHolder?, adapter: Adapter<*>?)
-    }
 }
