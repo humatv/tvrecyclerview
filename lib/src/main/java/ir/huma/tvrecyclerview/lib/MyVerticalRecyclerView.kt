@@ -54,10 +54,12 @@ class MyVerticalRecyclerView : RecyclerView {
         if (myOnKeyListener != null && myOnKeyListener?.onKey(this, event?.keyCode!!, event)!!) {
             return true
         }
+        val adap = (adapter as BaseRVAdapter<*, *>)
 //        Log.d(MyHorizontalRecyclerView::class.java.name, "dispatchKeyEvent : ${event.toString()}")
         if (event?.action == KeyEvent.ACTION_DOWN) {
             if (event?.keyCode == KeyEvent.KEYCODE_DPAD_UP) {
                 if (selectedPos - rowCount >= 0) {
+//                    if( adap!!.items[selectedPos-rowCount])
                     playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
                     smoothScrollToPosition(selectedPos - rowCount)
                     doScroll(selectedPos - rowCount, true)
@@ -169,7 +171,7 @@ class MyVerticalRecyclerView : RecyclerView {
         if (adapter is BaseRVAdapter<*, *>) {
             var holder = findViewHolderForAdapterPosition(selectedPos)
 
-            if (holder != null &&  holder is ItemSelectable) {
+            if (holder != null && holder is ItemSelectable) {
                 (holder as ItemSelectable).changeSelected(focus, focus, selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos))
             }
             if (focus && holder != null) {
@@ -181,7 +183,7 @@ class MyVerticalRecyclerView : RecyclerView {
                 }
 //                holder?.itemView!!.clearAnimation()
 //                holder?.itemView!!.startAnimation(animScaleIn)
-            } else if(holder != null){
+            } else if (holder != null) {
                 if (useAnim) {
                     animScaleOut = AnimationUtils.loadAnimation(context, R.anim.scale_out)
                     animScaleOut!!.fillAfter = true
@@ -196,49 +198,53 @@ class MyVerticalRecyclerView : RecyclerView {
     }
 
     fun selectItem(pos: Int) {
-        selectItem(pos,false)
+        selectItem(pos, false)
     }
 
-    fun selectItem(pos: Int,focus : Boolean) {
+    fun selectItem(pos: Int, focus: Boolean) {
         smoothScrollToPosition(pos)
         doScroll(pos, focus)
     }
 
-    fun doScroll(selectedPos: Int, focus: Boolean) {
+    fun doScroll(pos: Int, focus: Boolean) {
+        var selectedPos = pos
         temp = true;
         if (adapter is BaseRVAdapter<*, *>) {
-            var holder = findViewHolderForAdapterPosition(this.selectedPos)
+            var lastholder = findViewHolderForAdapterPosition(this.selectedPos)
 
-//            Log.d(MyHorizontalRecyclerView::class.java.name, "holder : ${holder.toString()}")
+            val gam = selectedPos - this.selectedPos;
+            do {
+                var temp = false
+                var holder = findViewHolderForAdapterPosition(selectedPos)
+                if (holder is ItemSelectable) {
 
-            if (holder is ItemSelectable) {
-
-                if (useAnim && focus) {
-                    animScaleOut = AnimationUtils.loadAnimation(context, R.anim.scale_out)
-                    animScaleOut!!.fillAfter = true
-                    holder.itemView.startAnimation(animScaleOut)
+                    if (holder.isSelectable(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos))) {
+                        if (lastholder is ItemSelectable) {
+                            if (useAnim && focus) {
+                                animScaleOut = AnimationUtils.loadAnimation(context, R.anim.scale_out)
+                                animScaleOut!!.fillAfter = true
+                                lastholder.itemView.startAnimation(animScaleOut)
+                            }
+                            (lastholder as ItemSelectable).changeSelected(false, focus, this.selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(this.selectedPos))
+                        }
+                        lastNotifyChange = selectedPos;
+                        if (focus) onItemSelectedListener?.onItemSelected(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter)
+                        if (useAnim && focus) {
+                            animScaleIn = AnimationUtils.loadAnimation(context, R.anim.scale_in)
+                            animScaleIn!!.fillAfter = true
+                            holder.itemView.startAnimation(animScaleIn)
+                        }
+                        (holder as ItemSelectable).changeSelected(true, focus, selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos))
+                    } else {
+                        if (selectedPos + gam >= 0 && selectedPos + gam < adapter!!.itemCount) {
+                            selectedPos += gam;
+                            temp = true
+                        } else {
+                            return;
+                        }
+                    }
                 }
-                (holder as ItemSelectable).changeSelected(false, focus, this.selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(this.selectedPos))
-
-//                Log.d(MyHorizontalRecyclerView::class.java.name, "selected false ${this.selectedPos}")
-            }
-
-
-            holder = findViewHolderForAdapterPosition(selectedPos)
-//            Log.d(MyHorizontalRecyclerView::class.java.name, "holder2 : ${holder.toString()}")
-
-            if (holder is ItemSelectable) {
-//                Log.d(MyHorizontalRecyclerView::class.java.name, "selected true ${selectedPos}")
-                lastNotifyChange = selectedPos;
-                if (focus) onItemSelectedListener?.onItemSelected(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter)
-                if (useAnim && focus) {
-                    animScaleIn = AnimationUtils.loadAnimation(context, R.anim.scale_in)
-                    animScaleIn!!.fillAfter = true
-                    holder.itemView.startAnimation(animScaleIn)
-                }
-                (holder as ItemSelectable).changeSelected(true, focus, selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos))
-
-            }
+            } while (temp)
         }
         this.selectedPos = selectedPos;
     }
