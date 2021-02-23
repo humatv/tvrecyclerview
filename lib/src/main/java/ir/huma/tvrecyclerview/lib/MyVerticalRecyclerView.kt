@@ -64,16 +64,18 @@ class MyVerticalRecyclerView : RecyclerView {
                     smoothScrollToPosition(selectedPos - rowCount)
                     doScroll(selectedPos - rowCount, true)
 //                    Log.d(MyHorizontalRecyclerView::class.java.name, "dpadRight")
+                    return true
+
                 }
-                return true
             } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
                 if (selectedPos + rowCount < adapter!!.itemCount) {
                     playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
                     smoothScrollToPosition(selectedPos + rowCount)
                     doScroll(selectedPos + rowCount, true)
 //                    Log.d(MyHorizontalRecyclerView::class.java.name, "dpadLeft")
+                    return true
+
                 }
-                return true
             } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
                 if ((selectedPos + 1) % rowCount != 0 && selectedPos + 1 < adapter!!.itemCount) {
                     playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN)
