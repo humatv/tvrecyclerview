@@ -54,86 +54,90 @@ class MyVerticalRecyclerView : RecyclerView {
         if (myOnKeyListener != null && myOnKeyListener?.onKey(this, event?.keyCode!!, event)!!) {
             return true
         }
-        val adap = (adapter as BaseRVAdapter<*, *>)
-//        Log.d(MyHorizontalRecyclerView::class.java.name, "dispatchKeyEvent : ${event.toString()}")
-        if (event?.action == KeyEvent.ACTION_DOWN) {
-            if (event?.keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-                if (selectedPos - rowCount >= 0) {
+        try {
+
+
+            if (event?.action == KeyEvent.ACTION_DOWN) {
+                if (event?.keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+                    if (selectedPos - rowCount >= 0) {
 //                    if( adap!!.items[selectedPos-rowCount])
-                    playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
-                    smoothScrollToPosition(selectedPos - rowCount)
-                    doScroll(selectedPos - rowCount, true)
+                        playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
+                        smoothScrollToPosition(selectedPos - rowCount)
+                        doScroll(selectedPos - rowCount, true)
 //                    Log.d(MyHorizontalRecyclerView::class.java.name, "dpadRight")
-                    return true
+                        return true
 
-                }
-            } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-                if (selectedPos + rowCount < adapter!!.itemCount) {
-                    playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
-                    smoothScrollToPosition(selectedPos + rowCount)
-                    doScroll(selectedPos + rowCount, true)
+                    }
+                } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                    if (selectedPos + rowCount < adapter!!.itemCount) {
+                        playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
+                        smoothScrollToPosition(selectedPos + rowCount)
+                        doScroll(selectedPos + rowCount, true)
 //                    Log.d(MyHorizontalRecyclerView::class.java.name, "dpadLeft")
-                    return true
+                        return true
 
-                }
-            } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                if ((selectedPos + 1) % rowCount != 0 && selectedPos + 1 < adapter!!.itemCount) {
-                    playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN)
-                    doScroll(selectedPos + 1, true)
-                    temp = true
-                    return true
-                }
-            } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
-                if ((selectedPos - 1) % rowCount < rowCount - 1 && selectedPos - 1 >= 0) {
-                    playSoundEffect(SoundEffectConstants.NAVIGATION_UP)
-                    doScroll(selectedPos - 1, true)
-                    temp = true
-                    return true
-                }
-            } else if (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER || event.keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-                val eventDuration = event.eventTime - event.downTime
-                if (eventDuration > ViewConfiguration.getLongPressTimeout()) {
-                    if (!longPress) {
-                        Log.d("MyVerticalGridView", "onKeyLongClick")
-                        try {
-                            if (onItemLongClickListener != null) {
-                                onItemLongClickListener?.onItemLongClick(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter)
-                            } else if (onItemClickListener != null) {
-                                onItemClickListener?.onItemClick(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter)
+                    }
+                } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                    if ((selectedPos + 1) % rowCount != 0 && selectedPos + 1 < adapter!!.itemCount) {
+                        playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN)
+                        doScroll(selectedPos + 1, true)
+                        temp = true
+                        return true
+                    }
+                } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+                    if ((selectedPos - 1) % rowCount < rowCount - 1 && selectedPos - 1 >= 0) {
+                        playSoundEffect(SoundEffectConstants.NAVIGATION_UP)
+                        doScroll(selectedPos - 1, true)
+                        temp = true
+                        return true
+                    }
+                } else if (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER || event.keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+                    val eventDuration = event.eventTime - event.downTime
+                    if (eventDuration > ViewConfiguration.getLongPressTimeout()) {
+                        if (!longPress) {
+                            Log.d("MyVerticalGridView", "onKeyLongClick")
+                            try {
+                                if (onItemLongClickListener != null) {
+                                    onItemLongClickListener?.onItemLongClick(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter)
+                                } else if (onItemClickListener != null) {
+                                    onItemClickListener?.onItemClick(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter)
+                                }
+                                playSoundEffect(SoundEffectConstants.CLICK)
+
+                            } catch (e: Exception) {
+                                e.printStackTrace()
                             }
+                        }
+                        longPress = true
+                        return true;
+                    }
+                }
+            } else if (event?.action == KeyEvent.ACTION_UP) {
+                if (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER || event.keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+                    return if (longPress) {
+                        longPress = false
+                        temp = false;
+                        return true
+                    } else {
+                        Log.d("MyVerticalGridView", "onKeyClick")
+                        try {
+                            onItemClickListener?.onItemClick(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter)
                             playSoundEffect(SoundEffectConstants.CLICK)
 
-                        } catch (e: Exception) {
+                        } catch (e: java.lang.Exception) {
                             e.printStackTrace()
                         }
+                        temp = false;
+                        return true
                     }
-                    longPress = true
-                    return true;
                 }
-            }
-        } else if (event?.action == KeyEvent.ACTION_UP) {
-            if (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER || event.keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-                return if (longPress) {
-                    longPress = false
+                if (temp) {
                     temp = false;
                     return true
-                } else {
-                    Log.d("MyVerticalGridView", "onKeyClick")
-                    try {
-                        onItemClickListener?.onItemClick(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter)
-                        playSoundEffect(SoundEffectConstants.CLICK)
+                }
+            }
+        } catch (e: Exception) {
 
-                    } catch (e: java.lang.Exception) {
-                        e.printStackTrace()
-                    }
-                    temp = false;
-                    return true
-                }
-            }
-            if (temp) {
-                temp = false;
-                return true
-            }
         }
 
         return super.dispatchKeyEvent(event)
