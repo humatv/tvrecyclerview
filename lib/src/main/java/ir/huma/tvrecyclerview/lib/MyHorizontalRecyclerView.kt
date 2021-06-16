@@ -3,16 +3,15 @@ package ir.huma.tvrecyclerview.lib
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
-import android.view.KeyEvent
-import android.view.SoundEffectConstants
-import android.view.View
+import android.view.*
 import android.view.View.OnFocusChangeListener
-import android.view.ViewConfiguration
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ir.atitec.everythingmanager.adapter.recyclerview.BaseRVAdapter
+import ir.atitec.everythingmanager.utility.RecyclerClickListener
+import ir.atitec.everythingmanager.utility.RecyclerTouchListener
 import ir.huma.tvrecyclerview.lib.listener.ItemSelectable
 import ir.huma.tvrecyclerview.lib.listener.OnItemClickListener
 import ir.huma.tvrecyclerview.lib.listener.OnItemLongClickListener
@@ -154,7 +153,28 @@ class MyHorizontalRecyclerView : RecyclerView {
     }
 
     fun initAnim() {
+        addOnItemTouchListener(RecyclerTouchListener(context, this, object : RecyclerClickListener {
+            override fun onClick(view: View?, position: Int) {
+                try {
+                    if (onItemClickListener != null)
+                        onItemClickListener?.onItemClick(position, (adapter as BaseRVAdapter<*, *>).getItem(position), findViewHolderForLayoutPosition(selectedPos), adapter)
+                } catch (e: java.lang.Exception) {
 
+                }
+            }
+
+            override fun onLongClick(view: View?, position: Int) {
+                try {
+                    if (onItemLongClickListener != null)
+                        onItemLongClickListener?.onItemLongClick(position, (adapter as BaseRVAdapter<*, *>).getItem(position), findViewHolderForLayoutPosition(selectedPos), adapter)
+                    else if (onItemClickListener != null)
+                        onItemClickListener?.onItemClick(position, (adapter as BaseRVAdapter<*, *>).getItem(position), findViewHolderForLayoutPosition(selectedPos), adapter)
+                } catch (e: java.lang.Exception) {
+
+                }
+            }
+
+        }))
 
     }
 
