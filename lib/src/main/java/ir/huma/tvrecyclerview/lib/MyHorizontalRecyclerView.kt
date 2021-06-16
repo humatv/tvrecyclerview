@@ -157,10 +157,10 @@ class MyHorizontalRecyclerView : RecyclerView {
         addOnItemTouchListener(RecyclerTouchListener(context, this, object : RecyclerClickListener {
             override fun onClick(view: View?, position: Int) {
                 try {
+                    doParentScroll()
                     requestFocus()
                     smoothScrollToPosition(position)
                     doScroll(position, true)
-                    doParentScroll()
                     if (onItemClickListener != null)
                         onItemClickListener?.onItemClick(position, (adapter as BaseRVAdapter<*, *>).getItem(position), findViewHolderForLayoutPosition(selectedPos), adapter)
                 } catch (e: java.lang.Exception) {
@@ -170,10 +170,10 @@ class MyHorizontalRecyclerView : RecyclerView {
 
             override fun onLongClick(view: View?, position: Int) {
                 try {
+                    doParentScroll()
                     requestFocus()
                     smoothScrollToPosition(position)
                     doScroll(position, true)
-                    doParentScroll()
                     if (onItemLongClickListener != null)
                         onItemLongClickListener?.onItemLongClick(position, (adapter as BaseRVAdapter<*, *>).getItem(position), findViewHolderForLayoutPosition(selectedPos), adapter)
                     else if (onItemClickListener != null)
@@ -189,9 +189,9 @@ class MyHorizontalRecyclerView : RecyclerView {
 
     fun doParentScroll() {
         if (parent is ViewGroup && parent.parent is ScrollView) {
-            if ((parent as ViewGroup).indexOfChild(this) > (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
+            if ((parent as ViewGroup).indexOfChild(this) < (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
                 (parent.parent as ScrollView).executeKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP))
-            } else if ((parent as ViewGroup).indexOfChild(this) < (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
+            } else if ((parent as ViewGroup).indexOfChild(this) > (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
                 (parent.parent as ScrollView).executeKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN))
             }
         }
