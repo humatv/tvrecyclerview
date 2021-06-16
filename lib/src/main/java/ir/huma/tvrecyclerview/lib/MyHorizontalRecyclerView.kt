@@ -7,6 +7,7 @@ import android.view.*
 import android.view.View.OnFocusChangeListener
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.ScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ir.atitec.everythingmanager.adapter.recyclerview.BaseRVAdapter
@@ -159,6 +160,7 @@ class MyHorizontalRecyclerView : RecyclerView {
                     requestFocus()
                     smoothScrollToPosition(position)
                     doScroll(position, true)
+                    doParentScroll()
                     if (onItemClickListener != null)
                         onItemClickListener?.onItemClick(position, (adapter as BaseRVAdapter<*, *>).getItem(position), findViewHolderForLayoutPosition(selectedPos), adapter)
                 } catch (e: java.lang.Exception) {
@@ -171,6 +173,7 @@ class MyHorizontalRecyclerView : RecyclerView {
                     requestFocus()
                     smoothScrollToPosition(position)
                     doScroll(position, true)
+                    doParentScroll()
                     if (onItemLongClickListener != null)
                         onItemLongClickListener?.onItemLongClick(position, (adapter as BaseRVAdapter<*, *>).getItem(position), findViewHolderForLayoutPosition(selectedPos), adapter)
                     else if (onItemClickListener != null)
@@ -182,6 +185,16 @@ class MyHorizontalRecyclerView : RecyclerView {
 
         }))
 
+    }
+
+    fun doParentScroll() {
+        if (parent is ViewGroup && parent.parent is ScrollView) {
+            if ((parent as ViewGroup).indexOfChild(this) > (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
+                (parent.parent as ScrollView).executeKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP))
+            } else if ((parent as ViewGroup).indexOfChild(this) < (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
+                (parent.parent as ScrollView).executeKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN))
+            }
+        }
     }
 
     override fun setLayoutManager(layout: LayoutManager?) {
