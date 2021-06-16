@@ -156,6 +156,7 @@ class MyHorizontalRecyclerView : RecyclerView {
         addOnItemTouchListener(RecyclerTouchListener(context, this, object : RecyclerClickListener {
             override fun onClick(view: View?, position: Int) {
                 try {
+                    requestFocus()
                     smoothScrollToPosition(position)
                     doScroll(position, true)
                     if (onItemClickListener != null)
@@ -167,6 +168,7 @@ class MyHorizontalRecyclerView : RecyclerView {
 
             override fun onLongClick(view: View?, position: Int) {
                 try {
+                    requestFocus()
                     smoothScrollToPosition(position)
                     doScroll(position, true)
                     if (onItemLongClickListener != null)
