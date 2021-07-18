@@ -3,16 +3,16 @@ package ir.huma.tvrecyclerview.lib
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
-import android.view.KeyEvent
-import android.view.SoundEffectConstants
-import android.view.View
+import android.view.*
 import android.view.View.OnFocusChangeListener
-import android.view.ViewConfiguration
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.ScrollView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ir.atitec.everythingmanager.adapter.recyclerview.BaseRVAdapter
+import ir.atitec.everythingmanager.utility.RecyclerClickListener
+import ir.atitec.everythingmanager.utility.RecyclerTouchListener
 import ir.huma.tvrecyclerview.lib.listener.ItemSelectable
 import ir.huma.tvrecyclerview.lib.listener.OnItemClickListener
 import ir.huma.tvrecyclerview.lib.listener.OnItemLongClickListener
@@ -28,11 +28,12 @@ class MyVerticalRecyclerView : RecyclerView {
     var millisecondPerInch = 35f
     var selectedPos = 0
     var useAnim = false
+    var isReverseLayout = false
     var lastNotifyChange = 0;
     var rowCount = 1
         set(value) {
             field = value
-            var layoutManager = CenterLayoutManager(context, field, GridLayoutManager.VERTICAL, false);
+            var layoutManager = CenterLayoutManager(context, field, GridLayoutManager.VERTICAL, isReverseLayout);
             layoutManager.setMillisecondPerInch(millisecondPerInch)
             super.setLayoutManager(layoutManager)
             super.setOnFocusChangeListener(focusChangeListener)
@@ -157,8 +158,47 @@ class MyVerticalRecyclerView : RecyclerView {
     }
 
     fun initAnim() {
+        addOnItemTouchListener(RecyclerTouchListener(context, this, object : RecyclerClickListener {
+            override fun onClick(view: View?, position: Int) {
+                try {
+                    doParentScroll()
+                    requestFocus()
+                    smoothScrollToPosition(position)
+                    doScroll(position, true)
+                    if (onItemClickListener != null)
+                        onItemClickListener?.onItemClick(position, (adapter as BaseRVAdapter<*, *>).getItem(position), findViewHolderForLayoutPosition(selectedPos), adapter)
+                } catch (e: java.lang.Exception) {
 
+                }
+            }
 
+            override fun onLongClick(view: View?, position: Int) {
+                try {
+                    doParentScroll()
+                    requestFocus()
+                    smoothScrollToPosition(position)
+                    doScroll(position, true)
+                    if (onItemLongClickListener != null)
+                        onItemLongClickListener?.onItemLongClick(position, (adapter as BaseRVAdapter<*, *>).getItem(position), findViewHolderForLayoutPosition(selectedPos), adapter)
+                    else if (onItemClickListener != null)
+                        onItemClickListener?.onItemClick(position, (adapter as BaseRVAdapter<*, *>).getItem(position), findViewHolderForLayoutPosition(selectedPos), adapter)
+                } catch (e: java.lang.Exception) {
+
+                }
+            }
+
+        }))
+
+    }
+
+    fun doParentScroll() {
+        if (parent is ViewGroup && parent.parent is ScrollView) {
+            if ((parent as ViewGroup).indexOfChild(this) < (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
+                (parent.parent as ScrollView).executeKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP))
+            } else if ((parent as ViewGroup).indexOfChild(this) > (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
+                (parent.parent as ScrollView).executeKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN))
+            }
+        }
     }
 
     override fun setLayoutManager(layout: LayoutManager?) {

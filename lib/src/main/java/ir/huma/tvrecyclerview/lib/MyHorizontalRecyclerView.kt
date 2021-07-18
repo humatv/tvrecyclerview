@@ -28,11 +28,12 @@ class MyHorizontalRecyclerView : RecyclerView {
     var millisecondPerInch = 35f
     var selectedPos = 0
     var useAnim = false
+    var isReverseLayout = false
     var lastNotifyChange = 0;
     var rowCount = 1
         set(value) {
             field = value
-            var layoutManager = CenterLayoutManager(context, field, GridLayoutManager.HORIZONTAL, false);
+            var layoutManager = CenterLayoutManager(context, field, GridLayoutManager.HORIZONTAL, isReverseLayout);
             layoutManager.setMillisecondPerInch(millisecondPerInch)
             super.setLayoutManager(layoutManager)
             super.setOnFocusChangeListener(focusChangeListener)
