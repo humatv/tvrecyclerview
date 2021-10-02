@@ -13,15 +13,13 @@ import androidx.recyclerview.widget.RecyclerView
 import ir.atitec.everythingmanager.adapter.recyclerview.BaseRVAdapter
 import ir.atitec.everythingmanager.utility.RecyclerClickListener
 import ir.atitec.everythingmanager.utility.RecyclerTouchListener
-import ir.huma.tvrecyclerview.lib.listener.ItemSelectable
-import ir.huma.tvrecyclerview.lib.listener.OnItemClickListener
-import ir.huma.tvrecyclerview.lib.listener.OnItemLongClickListener
-import ir.huma.tvrecyclerview.lib.listener.OnItemSelectedListener
+import ir.huma.tvrecyclerview.lib.listener.*
 
 class MyHorizontalRecyclerView : RecyclerView {
     var onItemClickListener: OnItemClickListener? = null
     var onItemLongClickListener: OnItemLongClickListener? = null
     var onItemSelectedListener: OnItemSelectedListener? = null
+    var onItemSelectedWithoutFocusListener: OnItemSelectedWithoutFocusListener? = null
     var animScaleIn: Animation? = null
     var animScaleOut: Animation? = null
     var myOnKeyListener: OnKeyListener? = null
@@ -250,42 +248,45 @@ class MyHorizontalRecyclerView : RecyclerView {
     }
 
     fun doScroll(selectedPos: Int, focus: Boolean) {
-        temp = true;
-        if (adapter is BaseRVAdapter<*, *>) {
-            var holder = findViewHolderForAdapterPosition(this.selectedPos)
+        if (selectedPos != this.selectedPos) {
+            temp = true;
+            if (adapter is BaseRVAdapter<*, *>) {
+                var holder = findViewHolderForAdapterPosition(this.selectedPos)
 
 //            Log.d(MyHorizontalRecyclerView::class.java.name, "holder : ${holder.toString()}")
 
-            if (holder is ItemSelectable) {
+                if (holder is ItemSelectable) {
 
-                if (useAnim && focus) {
-                    animScaleOut = AnimationUtils.loadAnimation(context, R.anim.scale_out)
-                    animScaleOut!!.fillAfter = true
-                    holder.itemView.startAnimation(animScaleOut)
-                }
-                (holder as ItemSelectable).changeSelected(false, focus, this.selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(this.selectedPos))
+                    if (useAnim && focus) {
+                        animScaleOut = AnimationUtils.loadAnimation(context, R.anim.scale_out)
+                        animScaleOut!!.fillAfter = true
+                        holder.itemView.startAnimation(animScaleOut)
+                    }
+                    (holder as ItemSelectable).changeSelected(false, focus, this.selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(this.selectedPos))
 
 //                Log.d(MyHorizontalRecyclerView::class.java.name, "selected false ${this.selectedPos}")
-            }
+                }
 
 
-            holder = findViewHolderForAdapterPosition(selectedPos)
+                holder = findViewHolderForAdapterPosition(selectedPos)
 //            Log.d(MyHorizontalRecyclerView::class.java.name, "holder2 : ${holder.toString()}")
 
-            if (holder is ItemSelectable) {
+                onItemSelectedWithoutFocusListener?.onItemSelectedWithoutFocus(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter)
+                if (holder is ItemSelectable) {
 //                Log.d(MyHorizontalRecyclerView::class.java.name, "selected true ${selectedPos}")
-                lastNotifyChange = selectedPos;
-                if (focus) onItemSelectedListener?.onItemSelected(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter)
-                if (useAnim && focus) {
-                    animScaleIn = AnimationUtils.loadAnimation(context, R.anim.scale_in)
-                    animScaleIn!!.fillAfter = true
-                    holder.itemView.startAnimation(animScaleIn)
-                }
-                (holder as ItemSelectable).changeSelected(true, focus, selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos))
+                    lastNotifyChange = selectedPos;
+                    if (focus) onItemSelectedListener?.onItemSelected(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter)
+                    if (useAnim && focus) {
+                        animScaleIn = AnimationUtils.loadAnimation(context, R.anim.scale_in)
+                        animScaleIn!!.fillAfter = true
+                        holder.itemView.startAnimation(animScaleIn)
+                    }
+                    (holder as ItemSelectable).changeSelected(true, focus, selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos))
 
+                }
             }
+            this.selectedPos = selectedPos;
         }
-        this.selectedPos = selectedPos;
     }
 
 }
