@@ -28,6 +28,8 @@ class MyVerticalRecyclerView : RecyclerView {
     var millisecondPerInch = 35f
     var selectedPos = 0
     var useAnim = false
+    var scaleInAnimSource = R.anim.scale_in
+    var scaleOutAnimSource = R.anim.scale_out
     var isReverseLayout = false
     var lastNotifyChange = 0;
     var rowCount = 1
@@ -223,7 +225,7 @@ class MyVerticalRecyclerView : RecyclerView {
             if (focus && holder != null) {
                 onItemSelectedListener?.onItemSelected(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter)
                 if (useAnim) {
-                    animScaleIn = AnimationUtils.loadAnimation(context, R.anim.scale_in)
+                    animScaleIn = AnimationUtils.loadAnimation(context, scaleInAnimSource)
                     animScaleIn!!.fillAfter = true
                     holder?.itemView!!.startAnimation(animScaleIn)
                 }
@@ -231,7 +233,7 @@ class MyVerticalRecyclerView : RecyclerView {
 //                holder?.itemView!!.startAnimation(animScaleIn)
             } else if (holder != null) {
                 if (useAnim) {
-                    animScaleOut = AnimationUtils.loadAnimation(context, R.anim.scale_out)
+                    animScaleOut = AnimationUtils.loadAnimation(context, scaleOutAnimSource)
                     animScaleOut!!.fillAfter = true
                     holder?.itemView!!.startAnimation(animScaleOut)
                 }
@@ -267,7 +269,7 @@ class MyVerticalRecyclerView : RecyclerView {
                     if (holder.isSelectable(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos))) {
                         if (lastholder is ItemSelectable) {
                             if (useAnim && focus) {
-                                animScaleOut = AnimationUtils.loadAnimation(context, R.anim.scale_out)
+                                animScaleOut = AnimationUtils.loadAnimation(context, scaleOutAnimSource)
                                 animScaleOut!!.fillAfter = true
                                 lastholder.itemView.startAnimation(animScaleOut)
                             }
@@ -276,7 +278,7 @@ class MyVerticalRecyclerView : RecyclerView {
                         lastNotifyChange = selectedPos;
                         if (focus) onItemSelectedListener?.onItemSelected(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter)
                         if (useAnim && focus) {
-                            animScaleIn = AnimationUtils.loadAnimation(context, R.anim.scale_in)
+                            animScaleIn = AnimationUtils.loadAnimation(context, scaleInAnimSource)
                             animScaleIn!!.fillAfter = true
                             holder.itemView.startAnimation(animScaleIn)
                         }

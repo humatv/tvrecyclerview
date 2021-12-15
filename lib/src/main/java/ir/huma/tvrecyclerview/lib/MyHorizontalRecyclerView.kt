@@ -26,6 +26,8 @@ class MyHorizontalRecyclerView : RecyclerView {
     var millisecondPerInch = 35f
     var selectedPos = 0
     var useAnim = false
+    var scaleInAnimSource = R.anim.scale_in
+    var scaleOutAnimSource = R.anim.scale_out
     var isReverseLayout = false
     var isLTR = true
     var lastNotifyChange = 0;
@@ -259,7 +261,7 @@ class MyHorizontalRecyclerView : RecyclerView {
                     selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter
                 )
                 if (useAnim) {
-                    animScaleIn = AnimationUtils.loadAnimation(context, R.anim.scale_in)
+                    animScaleIn = AnimationUtils.loadAnimation(context, scaleInAnimSource)
                     animScaleIn!!.fillAfter = true
                     holder?.itemView!!.startAnimation(animScaleIn)
                 }
@@ -267,7 +269,7 @@ class MyHorizontalRecyclerView : RecyclerView {
 //                holder?.itemView!!.startAnimation(animScaleIn)
             } else if (holder != null) {
                 if (useAnim) {
-                    animScaleOut = AnimationUtils.loadAnimation(context, R.anim.scale_out)
+                    animScaleOut = AnimationUtils.loadAnimation(context, scaleOutAnimSource)
                     animScaleOut!!.fillAfter = true
                     holder?.itemView!!.startAnimation(animScaleOut)
                 }
@@ -299,7 +301,7 @@ class MyHorizontalRecyclerView : RecyclerView {
                 if (holder is ItemSelectable) {
 
                     if (useAnim && focus) {
-                        animScaleOut = AnimationUtils.loadAnimation(context, R.anim.scale_out)
+                        animScaleOut = AnimationUtils.loadAnimation(context, scaleOutAnimSource)
                         animScaleOut!!.fillAfter = true
                         holder.itemView.startAnimation(animScaleOut)
                     }
@@ -319,7 +321,7 @@ class MyHorizontalRecyclerView : RecyclerView {
                     lastNotifyChange = selectedPos;
                     if (focus) onItemSelectedListener?.onItemSelected(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter)
                     if (useAnim && focus) {
-                        animScaleIn = AnimationUtils.loadAnimation(context, R.anim.scale_in)
+                        animScaleIn = AnimationUtils.loadAnimation(context, scaleInAnimSource)
                         animScaleIn!!.fillAfter = true
                         holder.itemView.startAnimation(animScaleIn)
                     }
