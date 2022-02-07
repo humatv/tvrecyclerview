@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "30.0.1"
+    compileSdkVersion 32
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "ir.huma.tvrecyclerview.app"
         minSdkVersion 22
-        targetSdkVersion 29
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
 
@@ -20,10 +21,42 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
+    implementation project(path: ':lib')
+
+    implementation 'com.google.android.material:material:1.1.0'
+
+    //Picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+
+    //Rx Java, Rx Android & Rx Kotlin
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.20'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.2.0'
+
+    //Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+
+    //Rx Call Adapter Factory
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+
+    //GSON Converter
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
 
 }

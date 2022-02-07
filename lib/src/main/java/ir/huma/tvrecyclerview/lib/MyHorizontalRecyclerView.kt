@@ -134,7 +134,7 @@ class MyHorizontalRecyclerView : RecyclerView {
                 if (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER || event.keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
                     return if (longPress) {
                         longPress = false
-                        temp = false;
+                        temp = false
                         return true
                     } else {
                         Log.d("MyVerticalGridView", "onKeyClick")
@@ -145,12 +145,12 @@ class MyHorizontalRecyclerView : RecyclerView {
                         } catch (e: java.lang.Exception) {
                             e.printStackTrace()
                         }
-                        temp = false;
+                        temp = false
                         return true
                     }
                 }
                 if (temp) {
-                    temp = false;
+                    temp = false
                     return true
                 }
             }
