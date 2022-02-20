@@ -16,7 +16,7 @@ import ir.atitec.everythingmanager.utility.RecyclerTouchListener
 import ir.huma.tvrecyclerview.lib.listener.*
 
 class MyHorizontalRecyclerView : RecyclerView {
-    private val TAG = "MyHorizontalRecyclerVie"
+    private val TAG = "MyHorizontalRecyclerView"
 
     var onItemClickListener: OnItemClickListener? = null
     var onItemLongClickListener: OnItemLongClickListener? = null
@@ -275,13 +275,13 @@ class MyHorizontalRecyclerView : RecyclerView {
     }
 
     fun doScroll(selectedPos: Int, focus: Boolean, runAnimation: Boolean = true) {
-        Log.d(
-            TAG, "doScroll : $selectedPos ${this.selectedPos} ${this.lastScrollSelectedPos}"
-        )
+//        Log.d(
+//            TAG, "doScroll : $selectedPos ${this.selectedPos} ${this.lastScrollSelectedPos}"
+//        )
         if (selectedPos != this.lastScrollSelectedPos) {
             temp = true;
 
-            Log.d(TAG, "lastScrollSelectedPos : ${this.lastScrollSelectedPos}")
+//            Log.d(TAG, "lastScrollSelectedPos : ${this.lastScrollSelectedPos}")
             callItemSelectable(lastScrollSelectedPos, false, focus, runAnimation)
             callItemSelectable(selectedPos, true, focus, runAnimation)
             lastNotifyChange = selectedPos;
@@ -297,7 +297,7 @@ class MyHorizontalRecyclerView : RecyclerView {
 
 
     fun selectLastPosition() {
-        Log.d(TAG, "isFocused : $isFocused")
+//        Log.d(TAG, "isFocused : $isFocused")
         if (isFocused) callItemSelectable(selectedPos, selected = true, focus = true)
     }
 
@@ -306,18 +306,17 @@ class MyHorizontalRecyclerView : RecyclerView {
     }
 
 
-    private fun callItemSelectable(selectedPos: Int, selected: Boolean, focus: Boolean, runAnimation: Boolean = true) {
+    private fun callItemSelectable(selectedPos: Int, selected: Boolean, focus: Boolean, runAnimation: Boolean = true,countCall : Int = 3) {
         var holder = findViewHolderForAdapterPosition(selectedPos)
-        Log.d(TAG, "callItemSelectable $selectedPos  $selected  $focus ${holder?.toString()}")
+//        Log.d(TAG, "callItemSelectable $selectedPos  $selected  $focus ${holder?.toString()}")
 
-        if (holder == null) {
-            handleViewHolderNullPosition(selectedPos, selected, focus, runAnimation)
-        }
-        if (holder is ItemSelectable) {
+        if (holder == null && countCall != 0) {
+            handleViewHolderNullPosition(selectedPos, selected, focus, runAnimation,countCall)
+        } else if (holder is ItemSelectable) {
             if (runAnimation && useAnim) runAnimation(selected, holder.itemView)
             if (focus) onItemSelectedListener?.onItemSelected(selectedPos, if (adapter is BaseRVAdapter<*, *>) (adapter as BaseRVAdapter<*, *>).getItem(selectedPos) else null, holder, adapter)
 
-            Log.d(TAG, "call change selected for $selectedPos")
+//            Log.d(TAG, "call change selected for $selectedPos")
             (holder as ItemSelectable).changeSelected(
                 selected, focus, selectedPos, if (adapter is BaseRVAdapter<*, *>) (adapter as BaseRVAdapter<*, *>).getItem(lastScrollSelectedPos) else null
             )
@@ -330,12 +329,12 @@ class MyHorizontalRecyclerView : RecyclerView {
         view.startAnimation(anim)
     }
 
-    private fun handleViewHolderNullPosition(selectedPos: Int, selected: Boolean, focus: Boolean, runAnimation: Boolean = true) {
+    private fun handleViewHolderNullPosition(selectedPos: Int, selected: Boolean, focus: Boolean, runAnimation: Boolean = true,countCall: Int) {
         Handler().postDelayed(Runnable {
-            Log.d(TAG, "handleViewHolderNullPosition $selectedPos  $selected  $focus}")
+//            Log.d(TAG, "handleViewHolderNullPosition selectedPos: $selectedPos  selected: $selected focus: $focus tryCount: $countCall")
             if (!selected || selectedPos == this.selectedPos) {
-                Log.d(TAG, "callItemSelectable return $selectedPos  $selected")
-                callItemSelectable(selectedPos, selected, focus, runAnimation)
+//                Log.d(TAG, "callItemSelectable return $selectedPos  $selected")
+                callItemSelectable(selectedPos, selected, focus, runAnimation,countCall -1)
             }
         }, 100)
     }
