@@ -1,11 +1,11 @@
 package ir.huma.tvrecyclerview.lib
 
 import android.content.Context
+import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
 import android.view.*
 import android.view.View.OnFocusChangeListener
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ScrollView
 import androidx.recyclerview.widget.GridLayoutManager
@@ -16,15 +16,16 @@ import ir.atitec.everythingmanager.utility.RecyclerTouchListener
 import ir.huma.tvrecyclerview.lib.listener.*
 
 class MyHorizontalRecyclerView : RecyclerView {
+    private val TAG = "MyHorizontalRecyclerView"
+
     var onItemClickListener: OnItemClickListener? = null
     var onItemLongClickListener: OnItemLongClickListener? = null
     var onItemSelectedListener: OnItemSelectedListener? = null
     var onItemSelectedWithoutFocusListener: OnItemSelectedWithoutFocusListener? = null
-    var animScaleIn: Animation? = null
-    var animScaleOut: Animation? = null
     var myOnKeyListener: OnKeyListener? = null
     var millisecondPerInch = 35f
     var selectedPos = 0
+    var lastScrollSelectedPos = 0
     var useAnim = false
     var scaleInAnimSource = R.anim.scale_in
     var scaleOutAnimSource = R.anim.scale_out
@@ -38,41 +39,31 @@ class MyHorizontalRecyclerView : RecyclerView {
             layoutManager.setMillisecondPerInch(millisecondPerInch)
             super.setLayoutManager(layoutManager)
             super.setOnFocusChangeListener(focusChangeListener)
-            super.addOnScrollListener(onMyScrollListener)
         }
 
-    var onMyScrollListener = object : OnScrollListener() {
-        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            if (recyclerView.hasFocus()) {
-                when (newState) {
-                    SCROLL_STATE_IDLE -> doScroll(
-                        selectedPos, true
-                    )                   //we reached the target position
-                }
-            }
-        }
-    }
 
     var longPress = false;
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
         if (myOnKeyListener != null && myOnKeyListener?.onKey(this, event?.keyCode!!, event)!!) {
             return true
         }
-//        Log.d(MyHorizontalRecyclerView::class.java.name, "dispatchKeyEvent : ${event.toString()}")
+
         try {
             if (event?.action == KeyEvent.ACTION_DOWN) {
                 if (event?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
                     if (!isLTR) {
                         if (selectedPos - rowCount >= 0) {
                             playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
-                            smoothScrollToPosition(selectedPos - rowCount)
-                            doScroll(selectedPos - rowCount, true)
+                            selectedPos = selectedPos - rowCount
+                            smoothScrollToPosition(selectedPos)
+                            doScroll(selectedPos, true)
                         }
                     } else {
                         if (selectedPos + rowCount < adapter!!.itemCount) {
                             playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
-                            smoothScrollToPosition(selectedPos + rowCount)
-                            doScroll(selectedPos + rowCount, true)
+                            selectedPos = selectedPos + rowCount
+                            smoothScrollToPosition(selectedPos)
+                            doScroll(selectedPos, true)
 //                    Log.d(MyHorizontalRecyclerView::class.java.name, "dpadLeft")
                         }
                     }
@@ -82,15 +73,17 @@ class MyHorizontalRecyclerView : RecyclerView {
                     if (!isLTR) {
                         if (selectedPos + rowCount < adapter!!.itemCount) {
                             playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
-                            smoothScrollToPosition(selectedPos + rowCount)
-                            doScroll(selectedPos + rowCount, true)
+                            selectedPos = selectedPos + rowCount
+                            smoothScrollToPosition(selectedPos)
+                            doScroll(selectedPos, true)
 //                    Log.d(MyHorizontalRecyclerView::class.java.name, "dpadLeft")
                         }
                     } else {
                         if (selectedPos - rowCount >= 0) {
                             playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
-                            smoothScrollToPosition(selectedPos - rowCount)
-                            doScroll(selectedPos - rowCount, true)
+                            selectedPos = selectedPos - rowCount
+                            smoothScrollToPosition(selectedPos)
+                            doScroll(selectedPos, true)
                         }
                     }
 
@@ -98,14 +91,16 @@ class MyHorizontalRecyclerView : RecyclerView {
                 } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
                     if ((selectedPos + 1) % rowCount != 0 && selectedPos + 1 < adapter!!.itemCount) {
                         playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN)
-                        doScroll(selectedPos + 1, true)
+                        selectedPos = selectedPos + 1
+                        doScroll(selectedPos, true)
                         temp = true
                         return true
                     }
                 } else if (event?.keyCode == KeyEvent.KEYCODE_DPAD_UP) {
                     if ((selectedPos - 1) % rowCount < rowCount - 1 && selectedPos - 1 >= 0) {
                         playSoundEffect(SoundEffectConstants.NAVIGATION_UP)
-                        doScroll(selectedPos - 1, true)
+                        selectedPos = selectedPos - 1
+                        doScroll(selectedPos, true)
                         temp = true
                         return true
                     }
@@ -113,12 +108,16 @@ class MyHorizontalRecyclerView : RecyclerView {
                     val eventDuration = event.eventTime - event.downTime
                     if (eventDuration > ViewConfiguration.getLongPressTimeout()) {
                         if (!longPress) {
-                            Log.d("MyVerticalGridView", "onKeyLongClick")
+                            Log.d(TAG, "onKeyLongClick")
                             try {
                                 if (onItemLongClickListener != null) {
-                                    onItemLongClickListener?.onItemLongClick(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter)
+                                    onItemLongClickListener?.onItemLongClick(
+                                        selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter
+                                    )
                                 } else if (onItemClickListener != null) {
-                                    onItemClickListener?.onItemClick(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter)
+                                    onItemClickListener?.onItemClick(
+                                        selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter
+                                    )
                                 }
                                 playSoundEffect(SoundEffectConstants.CLICK)
 
@@ -137,9 +136,11 @@ class MyHorizontalRecyclerView : RecyclerView {
                         temp = false
                         return true
                     } else {
-                        Log.d("MyVerticalGridView", "onKeyClick")
+                        Log.d(TAG, "onKeyClick")
                         try {
-                            onItemClickListener?.onItemClick(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter)
+                            onItemClickListener?.onItemClick(
+                                selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter
+                            )
                             playSoundEffect(SoundEffectConstants.CLICK)
 
                         } catch (e: java.lang.Exception) {
@@ -177,12 +178,13 @@ class MyHorizontalRecyclerView : RecyclerView {
         initAnim()
     }
 
-    fun initAnim() {
+    private fun initAnim() {
         addOnItemTouchListener(RecyclerTouchListener(context, this, object : RecyclerClickListener {
             override fun onClick(view: View?, position: Int) {
                 try {
                     doParentScroll()
                     requestFocus()
+                    selectedPos = position
                     smoothScrollToPosition(position)
                     doScroll(position, true)
                     if (onItemClickListener != null) onItemClickListener?.onItemClick(
@@ -197,6 +199,7 @@ class MyHorizontalRecyclerView : RecyclerView {
                 try {
                     doParentScroll()
                     requestFocus()
+                    selectedPos = position
                     smoothScrollToPosition(position)
                     doScroll(position, true)
                     if (onItemLongClickListener != null) onItemLongClickListener?.onItemLongClick(
@@ -214,7 +217,7 @@ class MyHorizontalRecyclerView : RecyclerView {
 
     }
 
-    fun doParentScroll() {
+    private fun doParentScroll() {
         if (parent is ViewGroup && parent.parent is ScrollView) {
             if ((parent as ViewGroup).indexOfChild(this) < (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
                 (parent.parent as ScrollView).executeKeyEvent(
@@ -236,8 +239,7 @@ class MyHorizontalRecyclerView : RecyclerView {
     }
 
     override fun setLayoutManager(layout: LayoutManager?) {
-//        super.setLayoutManager(layout);
-        throw RuntimeException("please set rowCount , dont need setLayoutManager...")
+        throw RuntimeException("please set rowCount , don't need setLayoutManager...")
     }
 
     var temp = false;
@@ -248,90 +250,84 @@ class MyHorizontalRecyclerView : RecyclerView {
 
     var myfocusChangeListener: OnFocusChangeListener? = null
     var focusChangeListener = OnFocusChangeListener { view: View, focus: Boolean ->
-        if (adapter is BaseRVAdapter<*, *>) {
-            var holder = findViewHolderForAdapterPosition(selectedPos)
+        callItemSelectable(selectedPos, focus, focus)
 
-            if (holder != null && holder is ItemSelectable) {
-                (holder as ItemSelectable).changeSelected(
-                    focus, focus, selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos)
-                )
-            }
-            if (focus && holder != null) {
-                onItemSelectedListener?.onItemSelected(
-                    selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter
-                )
-                if (useAnim) {
-                    animScaleIn = AnimationUtils.loadAnimation(context, scaleInAnimSource)
-                    animScaleIn!!.fillAfter = true
-                    holder?.itemView!!.startAnimation(animScaleIn)
-                }
-//                holder?.itemView!!.clearAnimation()
-//                holder?.itemView!!.startAnimation(animScaleIn)
-            } else if (holder != null) {
-                if (useAnim) {
-                    animScaleOut = AnimationUtils.loadAnimation(context, scaleOutAnimSource)
-                    animScaleOut!!.fillAfter = true
-                    holder?.itemView!!.startAnimation(animScaleOut)
-                }
-//                holder?.itemView!!.clearAnimation()
-//                holder?.itemView!!.startAnimation(animScaleOut)
-            }
-
-        }
         myfocusChangeListener?.onFocusChange(view, focus)
     }
 
     fun selectItem(pos: Int) {
-        selectItem(pos, false)
+        selectItem(pos, false, false)
     }
 
-    fun selectItem(pos: Int, focus: Boolean) {
+    fun selectItem(pos: Int, focus: Boolean, runAnimation: Boolean = true) {
         smoothScrollToPosition(pos)
-        doScroll(pos, focus)
+        selectedPos = pos;
+        doScroll(pos, focus, runAnimation)
     }
 
-    fun doScroll(selectedPos: Int, focus: Boolean) {
-        if (selectedPos != this.selectedPos) {
+    fun doScroll(selectedPos: Int, focus: Boolean, runAnimation: Boolean = true) {
+//        Log.d(
+//            TAG, "doScroll : $selectedPos ${this.selectedPos} ${this.lastScrollSelectedPos}"
+//        )
+        if (selectedPos != this.lastScrollSelectedPos) {
             temp = true;
-            if (adapter is BaseRVAdapter<*, *>) {
-                var holder = findViewHolderForAdapterPosition(this.selectedPos)
 
-//            Log.d(MyHorizontalRecyclerView::class.java.name, "holder : ${holder.toString()}")
+//            Log.d(TAG, "lastScrollSelectedPos : ${this.lastScrollSelectedPos}")
+            callItemSelectable(lastScrollSelectedPos, false, focus, runAnimation)
+            callItemSelectable(selectedPos, true, focus, runAnimation)
+            lastNotifyChange = selectedPos;
 
-                if (holder is ItemSelectable) {
-
-                    if (useAnim && focus) {
-                        animScaleOut = AnimationUtils.loadAnimation(context, scaleOutAnimSource)
-                        animScaleOut!!.fillAfter = true
-                        holder.itemView.startAnimation(animScaleOut)
-                    }
-                    (holder as ItemSelectable).changeSelected(false, focus, this.selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(this.selectedPos))
-
-
-//                Log.d(MyHorizontalRecyclerView::class.java.name, "selected false ${this.selectedPos}")
-                }
-
-
-                holder = findViewHolderForAdapterPosition(selectedPos)
-//            Log.d(MyHorizontalRecyclerView::class.java.name, "holder2 : ${holder.toString()}")
-
-                onItemSelectedWithoutFocusListener?.onItemSelectedWithoutFocus(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter)
-                if (holder is ItemSelectable) {
-//                Log.d(MyHorizontalRecyclerView::class.java.name, "selected true ${selectedPos}")
-                    lastNotifyChange = selectedPos;
-                    if (focus) onItemSelectedListener?.onItemSelected(selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), holder, adapter)
-                    if (useAnim && focus) {
-                        animScaleIn = AnimationUtils.loadAnimation(context, scaleInAnimSource)
-                        animScaleIn!!.fillAfter = true
-                        holder.itemView.startAnimation(animScaleIn)
-                    }
-                    (holder as ItemSelectable).changeSelected(true, focus, selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos))
-
-
-                }
-            }
-            this.selectedPos = selectedPos;
+            onItemSelectedWithoutFocusListener?.onItemSelectedWithoutFocus(
+                selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForAdapterPosition(selectedPos), adapter
+            )
+            this.lastScrollSelectedPos = selectedPos
+        } else {
+            callItemSelectable(selectedPos, true, focus, runAnimation)
         }
+    }
+
+
+    fun selectLastPosition() {
+//        Log.d(TAG, "isFocused : $isFocused")
+        if (isFocused) callItemSelectable(selectedPos, selected = true, focus = true)
+    }
+
+    fun deSelect() {
+        callItemSelectable(selectedPos, false, false, isFocused)
+    }
+
+
+    private fun callItemSelectable(selectedPos: Int, selected: Boolean, focus: Boolean, runAnimation: Boolean = true, countCall: Int = 3) {
+        var holder = findViewHolderForAdapterPosition(selectedPos)
+//        Log.d(TAG, "callItemSelectable $selectedPos  $selected  $focus ${holder?.toString()}")
+
+        if (holder == null && countCall != 0) {
+            handleViewHolderNullPosition(selectedPos, selected, focus, runAnimation, countCall)
+        } else if (holder is ItemSelectable) {
+            if (runAnimation && useAnim) runAnimation(selected, holder.itemView)
+            if (focus) onItemSelectedListener?.onItemSelected(selectedPos, if (adapter is BaseRVAdapter<*, *>) (adapter as BaseRVAdapter<*, *>).getItem(selectedPos) else null, holder, adapter)
+
+//            Log.d(TAG, "call change selected for $selectedPos")
+            (holder as ItemSelectable).changeSelected(
+                selected, focus, selectedPos, if (adapter is BaseRVAdapter<*, *>) (adapter as BaseRVAdapter<*, *>).getItem(lastScrollSelectedPos) else null
+            )
+        }
+    }
+
+    private fun runAnimation(selected: Boolean, view: View) {
+        var anim = if (selected) AnimationUtils.loadAnimation(context, scaleInAnimSource) else AnimationUtils.loadAnimation(context, scaleOutAnimSource)
+        anim!!.fillAfter = true
+        view.startAnimation(anim)
+    }
+
+    private fun handleViewHolderNullPosition(selectedPos: Int, selected: Boolean, focus: Boolean, runAnimation: Boolean = true, countCall: Int) {
+        Handler().postDelayed(Runnable {
+//            Log.d(TAG, "handleViewHolderNullPosition selectedPos: $selectedPos  selected: $selected focus: $focus tryCount: $countCall")
+            if (!selected || selectedPos == this.selectedPos) {
+//                Log.d(TAG, "callItemSelectable return $selectedPos  $selected")
+                callItemSelectable(selectedPos, selected, focus, runAnimation, countCall - 1)
+            }
+        }, 200)
     }
 
 }
