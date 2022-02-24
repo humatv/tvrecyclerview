@@ -108,7 +108,7 @@ class MyHorizontalRecyclerView : RecyclerView {
                     val eventDuration = event.eventTime - event.downTime
                     if (eventDuration > ViewConfiguration.getLongPressTimeout()) {
                         if (!longPress) {
-                            Log.d(TAG, "onKeyLongClick")
+//                            Log.d(TAG, "onKeyLongClick")
                             try {
                                 if (onItemLongClickListener != null) {
                                     onItemLongClickListener?.onItemLongClick(
@@ -136,7 +136,7 @@ class MyHorizontalRecyclerView : RecyclerView {
                         temp = false
                         return true
                     } else {
-                        Log.d(TAG, "onKeyClick")
+//                        Log.d(TAG, "onKeyClick")
                         try {
                             onItemClickListener?.onItemClick(
                                 selectedPos, (adapter as BaseRVAdapter<*, *>).getItem(selectedPos), findViewHolderForLayoutPosition(selectedPos), adapter
