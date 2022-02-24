@@ -149,15 +149,6 @@ class MyHorizontalRecyclerView : RecyclerView {
                         temp = false;
                         return true
                     }
-                } else if (event.keyCode == KeyEvent.KEYCODE_DPAD_LEFT || event.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                    val eventDuration = event.eventTime - event.downTime
-                    if (eventDuration > ViewConfiguration.getLongPressTimeout()) {
-                        Log.d(
-                            TAG, "lognpress : $selectedPos   ${adapter?.itemCount}  $lastScrollSelectedPos"
-                        )
-                        Handler().postDelayed({ if (isFocused) callItemSelectable(selectedPos, true, true) }, 100)
-                    }
-                    return true
                 }
                 if (temp) {
                     temp = false;
@@ -306,12 +297,12 @@ class MyHorizontalRecyclerView : RecyclerView {
     }
 
 
-    private fun callItemSelectable(selectedPos: Int, selected: Boolean, focus: Boolean, runAnimation: Boolean = true,countCall : Int = 3) {
+    private fun callItemSelectable(selectedPos: Int, selected: Boolean, focus: Boolean, runAnimation: Boolean = true, countCall: Int = 3) {
         var holder = findViewHolderForAdapterPosition(selectedPos)
 //        Log.d(TAG, "callItemSelectable $selectedPos  $selected  $focus ${holder?.toString()}")
 
         if (holder == null && countCall != 0) {
-            handleViewHolderNullPosition(selectedPos, selected, focus, runAnimation,countCall)
+            handleViewHolderNullPosition(selectedPos, selected, focus, runAnimation, countCall)
         } else if (holder is ItemSelectable) {
             if (runAnimation && useAnim) runAnimation(selected, holder.itemView)
             if (focus) onItemSelectedListener?.onItemSelected(selectedPos, if (adapter is BaseRVAdapter<*, *>) (adapter as BaseRVAdapter<*, *>).getItem(selectedPos) else null, holder, adapter)
@@ -329,14 +320,14 @@ class MyHorizontalRecyclerView : RecyclerView {
         view.startAnimation(anim)
     }
 
-    private fun handleViewHolderNullPosition(selectedPos: Int, selected: Boolean, focus: Boolean, runAnimation: Boolean = true,countCall: Int) {
+    private fun handleViewHolderNullPosition(selectedPos: Int, selected: Boolean, focus: Boolean, runAnimation: Boolean = true, countCall: Int) {
         Handler().postDelayed(Runnable {
 //            Log.d(TAG, "handleViewHolderNullPosition selectedPos: $selectedPos  selected: $selected focus: $focus tryCount: $countCall")
             if (!selected || selectedPos == this.selectedPos) {
 //                Log.d(TAG, "callItemSelectable return $selectedPos  $selected")
-                callItemSelectable(selectedPos, selected, focus, runAnimation,countCall -1)
+                callItemSelectable(selectedPos, selected, focus, runAnimation, countCall - 1)
             }
-        }, 100)
+        }, 200)
     }
 
 }
