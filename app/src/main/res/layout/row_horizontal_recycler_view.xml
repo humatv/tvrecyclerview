@@ -3,8 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     tools:context=".view.HorizontalRecyclerViewActivity">
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_height="wrap_content" />
 
     <ir.huma.tvrecyclerview.lib.TvRecyclerView
         android:id="@+id/horizontal_recycler_view"
@@ -12,8 +19,8 @@
         android:layout_height="wrap_content"
         android:clipChildren="false"
         android:clipToPadding="false"
-        app:useAnim="true"
-        app:rowCount="4"
-        android:padding="8dp" />
+        android:padding="8dp"
+        app:rowCount="1"
+        app:useAnim="true" />
 
 </LinearLayout>

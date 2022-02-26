@@ -6,9 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".view.VerticalRecyclerViewActivity">
 
-    <ir.huma.tvrecyclerview.lib.MyVerticalRecyclerView
+    <ir.huma.tvrecyclerview.lib.TvRecyclerView
         android:id="@+id/vertical_recycler_view"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:padding="8dp"
+        app:useAnim="true"
+        app:rowCount="5"
+        app:layoutOrientation="vertical"
         android:layout_height="match_parent"/>
 
 </LinearLayout>

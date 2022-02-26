@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="TvRecyclerView">
+        <attr name="useAnim" format="boolean" />
+        <attr name="scrollSpeed" format="float" />
+        <attr name="selectAnimation" format="reference" />
+        <attr name="unselectAnimation" format="reference" />
+        <attr name="reverseLayout" format="boolean" />
+        <attr name="isLTR" format="boolean" />
+        <attr name="rowCount" format="integer" />
+        <attr name="layoutOrientation">
+            <enum name="horizontal" value="0" />
+            <enum name="vertical" value="1" />
+        </attr>
+    </declare-styleable>
+
+</resources>

@@ -9,6 +9,7 @@ import ir.huma.tvrecyclerview.app.R
 class MainActivity : AppCompatActivity() {
     private lateinit var verticalRecyclerViewItem : CardView
     private lateinit var horizontalRecyclerViewItem : CardView
+    private lateinit var verticalhorizontalRecyclerViewItem : CardView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private fun initViews() {
         verticalRecyclerViewItem = findViewById(R.id.vertical_recycler_view_item_layout)
         horizontalRecyclerViewItem = findViewById(R.id.horizontal_recycler_view_item_layout)
+        verticalhorizontalRecyclerViewItem = findViewById(R.id.vertical_horizontal_recycler_view_item_layout)
         initListeners()
     }
 
@@ -27,6 +29,9 @@ class MainActivity : AppCompatActivity() {
         }
         horizontalRecyclerViewItem.setOnClickListener {
             startActivity(Intent(this,HorizontalRecyclerViewActivity::class.java))
+        }
+        verticalhorizontalRecyclerViewItem.setOnClickListener {
+            startActivity(Intent(this,VerticalHorizontalActivity::class.java))
         }
     }
 }

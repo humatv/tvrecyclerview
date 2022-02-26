@@ -1,76 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:gravity="center"
+    android:orientation="horizontal"
     tools:context=".view.MainActivity">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/vertical_recycler_view_item_layout"
-        android:layout_margin="8dp"
-        app:cardElevation="4dp"
-        app:cardCornerRadius="16dp"
-        android:layout_gravity="center"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp">
 
         <LinearLayout
             android:layout_width="175dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
+
             <ImageView
                 android:layout_width="150dp"
                 android:layout_height="120dp"
-                android:src="@drawable/ic_arrow"
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:padding="12dp"
-                />
+                android:src="@drawable/ic_arrow" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Vertical RecyclerView"
                 android:layout_gravity="center"
-                android:layout_margin="8dp"/>
+                android:layout_margin="8dp"
+                android:text="Vertical RecyclerView" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/horizontal_recycler_view_item_layout"
-        android:layout_margin="8dp"
-        app:cardElevation="4dp"
-        app:cardCornerRadius="16dp"
-        android:layout_gravity="center"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp">
 
         <LinearLayout
             android:layout_width="175dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
+
             <ImageView
                 android:layout_width="150dp"
                 android:layout_height="120dp"
-                android:rotation="90"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_arrow"
                 android:adjustViewBounds="true"
                 android:padding="12dp"
-                />
+                android:rotation="90"
+                android:src="@drawable/ic_arrow" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Horizontal RecyclerView"
                 android:layout_gravity="center"
-                android:layout_margin="8dp"/>
+                android:layout_margin="8dp"
+                android:text="Horizontal RecyclerView" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/vertical_horizontal_recycler_view_item_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="175dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="120dp"
+                    android:adjustViewBounds="true"
+                    android:padding="12dp"
+                    android:rotation="90"
+                    android:src="@drawable/ic_arrow" />
+
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="120dp"
+                    android:adjustViewBounds="true"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_arrow" />
+
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="8dp"
+                android:text="Horizontal RecyclerView" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
