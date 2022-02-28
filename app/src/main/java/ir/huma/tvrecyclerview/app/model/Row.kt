@@ -15,6 +15,7 @@ import ir.huma.tvrecyclerview.lib.TvRecyclerView
 import ir.huma.tvrecyclerview.lib.adapter.BaseRVAdapter
 import ir.huma.tvrecyclerview.lib.adapter.BaseRVHolder
 import ir.huma.tvrecyclerview.lib.listener.OnItemClickListener
+import ir.huma.tvrecyclerview.lib.listener.OnItemLongClickListener
 
 class Row(val page : Int) {
 
@@ -32,6 +33,31 @@ class Row(val page : Int) {
             recyclerView.selectLastPosition()
 
             getMovies(moviesAdapter,t.page)
+
+            recyclerView.onItemClickListener = object : OnItemClickListener{
+                override fun onItemClick(
+                    position: Int,
+                    obj: Any?,
+                    v: RecyclerView.ViewHolder?,
+                    adapter: RecyclerView.Adapter<*>?
+                ) {
+                    Toast.makeText(context,"click : row:${pos} column:${position}",Toast.LENGTH_SHORT).show()
+                }
+
+            }
+
+            recyclerView.onItemLongClickListener = object : OnItemLongClickListener{
+                override fun onItemLongClick(
+                    position: Int,
+                    obj: Any?,
+                    v: RecyclerView.ViewHolder?,
+                    adapter: RecyclerView.Adapter<*>?
+                ) {
+                    Toast.makeText(context,"longClick : row:${pos} column:${position}",Toast.LENGTH_SHORT).show()
+                }
+
+            }
+
         }
 
         private fun getMovies(moviesAdapter: BaseRVAdapter<*,Movie>,page :Int) {

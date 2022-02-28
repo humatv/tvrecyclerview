@@ -5,6 +5,7 @@ import android.content.res.TypedArray
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.Log
 import android.view.*
 import android.view.View.OnFocusChangeListener
 import android.view.animation.AnimationUtils
@@ -81,6 +82,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
 
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
+        Log.d(TAG, "dispatchKeyEvent: ${event.toString()}")
         if (myOnKeyListener != null && myOnKeyListener?.onKey(this, event?.keyCode!!, event)!!) {
             return true
         }
@@ -94,6 +96,8 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                             selectedPos -= rowCount
                             smoothScrollToPosition(selectedPos)
                             doScroll(selectedPos, true)
+                            temp = true
+                            return true
                         }
                     } else {
                         if (selectedPos + rowCount < adapter!!.itemCount) {
@@ -101,10 +105,10 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                             selectedPos += rowCount
                             smoothScrollToPosition(selectedPos)
                             doScroll(selectedPos, true)
+                            temp = true
+                            return true
                         }
                     }
-
-                    return true
                 } else if (event.keyCode == decreaseKeyCode) {
                     if (!isLTR) {
                         if (selectedPos + rowCount < adapter!!.itemCount) {
@@ -112,6 +116,8 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                             selectedPos += rowCount
                             smoothScrollToPosition(selectedPos)
                             doScroll(selectedPos, true)
+                            temp = true
+                            return true
                         }
                     } else {
                         if (selectedPos - rowCount >= 0) {
@@ -119,10 +125,11 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                             selectedPos -= rowCount
                             smoothScrollToPosition(selectedPos)
                             doScroll(selectedPos, true)
+                            temp = true
+                            return true
                         }
                     }
 
-                    return true
                 } else if (event.keyCode == increaseRowKeyCode) {
                     if ((selectedPos + 1) % rowCount != 0 && selectedPos + 1 < adapter!!.itemCount) {
                         playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN)
@@ -151,6 +158,8 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                                         findViewHolderForLayoutPosition(selectedPos),
                                         adapter
                                     )
+                                    longPress = true
+                                    return true
                                 } else if (onItemClickListener != null) {
                                     onItemClickListener?.onItemClick(
                                         selectedPos,
@@ -158,6 +167,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                                         findViewHolderForLayoutPosition(selectedPos),
                                         adapter
                                     )
+                                    return true
                                 }
                                 playSoundEffect(SoundEffectConstants.CLICK)
 
@@ -165,17 +175,15 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                                 e.printStackTrace()
                             }
                         }
-                        longPress = true
-                        return true
                     }
                 }
             } else if (event?.action == KeyEvent.ACTION_UP) {
                 if (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER || event.keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-                    return if (longPress) {
+                    if (longPress && onItemLongClickListener != null) {
                         longPress = false
                         temp = false
-                        true
-                    } else {
+                        return true
+                    } else if (onItemClickListener != null) {
                         try {
                             onItemClickListener?.onItemClick(
                                 selectedPos,
@@ -185,231 +193,238 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                             )
                             playSoundEffect(SoundEffectConstants.CLICK)
 
-                        } catch (e: java.lang.Exception) {
+                        } catch (e: Exception) {
                             e.printStackTrace()
                         }
                         temp = false
-                        true
+                        return true
                     }
-                }
-                if (temp) {
+                } else if(temp){
                     temp = false
                     return true
                 }
             }
-        } catch (e: Exception) {
+            } catch (e: Exception) {
 
+            }
+
+            return super.dispatchKeyEvent(event)
         }
 
 
-        return super.dispatchKeyEvent(event)
-    }
+        private fun initAnim() {
+            addOnItemTouchListener(
+                RecyclerTouchListener(
+                    context,
+                    this,
+                    object : RecyclerClickListener {
+                        override fun onClick(view: View?, position: Int) {
+                            try {
+                                doParentScroll()
+                                requestFocus()
+                                selectedPos = position
+                                smoothScrollToPosition(position)
+                                doScroll(position, true)
+                                if (onItemClickListener != null) onItemClickListener?.onItemClick(
+                                    position,
+                                    (adapter as BaseRVAdapter<*, *>).getItem(position),
+                                    findViewHolderForLayoutPosition(selectedPos),
+                                    adapter
+                                )
+                            } catch (e: java.lang.Exception) {
 
+                            }
+                        }
 
-    private fun initAnim() {
-        addOnItemTouchListener(RecyclerTouchListener(context, this, object : RecyclerClickListener {
-            override fun onClick(view: View?, position: Int) {
-                try {
-                    doParentScroll()
-                    requestFocus()
-                    selectedPos = position
-                    smoothScrollToPosition(position)
-                    doScroll(position, true)
-                    if (onItemClickListener != null) onItemClickListener?.onItemClick(
-                        position,
-                        (adapter as BaseRVAdapter<*, *>).getItem(position),
-                        findViewHolderForLayoutPosition(selectedPos),
-                        adapter
+                        override fun onLongClick(view: View?, position: Int) {
+                            try {
+                                doParentScroll()
+                                requestFocus()
+                                selectedPos = position
+                                smoothScrollToPosition(position)
+                                doScroll(position, true)
+                                if (onItemLongClickListener != null) onItemLongClickListener?.onItemLongClick(
+                                    position,
+                                    (adapter as BaseRVAdapter<*, *>).getItem(position),
+                                    findViewHolderForLayoutPosition(selectedPos),
+                                    adapter
+                                )
+                                else if (onItemClickListener != null) onItemClickListener?.onItemClick(
+                                    position,
+                                    (adapter as BaseRVAdapter<*, *>).getItem(position),
+                                    findViewHolderForLayoutPosition(selectedPos),
+                                    adapter
+                                )
+                            } catch (e: java.lang.Exception) {
+
+                            }
+                        }
+
+                    })
+            )
+
+        }
+
+        private fun doParentScroll() {
+            if (parent is ViewGroup && parent.parent is ScrollView) {
+                if ((parent as ViewGroup).indexOfChild(this) < (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
+                    (parent.parent as ScrollView).executeKeyEvent(
+                        KeyEvent(
+                            KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP
+                        )
                     )
-                } catch (e: java.lang.Exception) {
-
+                } else if ((parent as ViewGroup).indexOfChild(this) > (parent as ViewGroup).indexOfChild(
+                        (parent as ViewGroup).findFocus()
+                    )
+                ) {
+                    (parent.parent as ScrollView).executeKeyEvent(
+                        KeyEvent(
+                            KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN
+                        )
+                    )
                 }
-            }
-
-            override fun onLongClick(view: View?, position: Int) {
-                try {
-                    doParentScroll()
-                    requestFocus()
-                    selectedPos = position
-                    smoothScrollToPosition(position)
-                    doScroll(position, true)
-                    if (onItemLongClickListener != null) onItemLongClickListener?.onItemLongClick(
-                        position,
-                        (adapter as BaseRVAdapter<*, *>).getItem(position),
-                        findViewHolderForLayoutPosition(selectedPos),
-                        adapter
-                    )
-                    else if (onItemClickListener != null) onItemClickListener?.onItemClick(
-                        position,
-                        (adapter as BaseRVAdapter<*, *>).getItem(position),
-                        findViewHolderForLayoutPosition(selectedPos),
-                        adapter
-                    )
-                } catch (e: java.lang.Exception) {
-
-                }
-            }
-
-        }))
-
-    }
-
-    private fun doParentScroll() {
-        if (parent is ViewGroup && parent.parent is ScrollView) {
-            if ((parent as ViewGroup).indexOfChild(this) < (parent as ViewGroup).indexOfChild((parent as ViewGroup).findFocus())) {
-                (parent.parent as ScrollView).executeKeyEvent(
-                    KeyEvent(
-                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP
-                    )
-                )
-            } else if ((parent as ViewGroup).indexOfChild(this) > (parent as ViewGroup).indexOfChild(
-                    (parent as ViewGroup).findFocus()
-                )
-            ) {
-                (parent.parent as ScrollView).executeKeyEvent(
-                    KeyEvent(
-                        KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN
-                    )
-                )
             }
         }
-    }
 
-    //    @Deprecated(
+        //    @Deprecated(
 //        "you should call setLayoutManager with param(orientation,rowCount)",
 //        ReplaceWith("throw RuntimeException(\"please set rowCount , don't need setLayoutManager(LayoutManager)\")")
 //    )
-    override fun setLayoutManager(layout: LayoutManager?) {
+        override fun setLayoutManager(layout: LayoutManager?) {
 //        throw RuntimeException("")
-    }
-
-    private fun setLayoutManager() {
-        val layoutManager = CenterLayoutManager(context, rowCount, orientation, isReverseLayout)
-        layoutManager.setMillisecondPerInch(scrollSpeed)
-        if (orientation == VERTICAL) {
-            increaseKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
-            decreaseKeyCode = KeyEvent.KEYCODE_DPAD_UP
-            increaseRowKeyCode = KeyEvent.KEYCODE_DPAD_RIGHT
-            decreaseRowKeyCode = KeyEvent.KEYCODE_DPAD_LEFT
         }
 
-        super.setLayoutManager(layoutManager)
-        super.setOnFocusChangeListener(focusChangeListener)
+        private fun setLayoutManager() {
+            val layoutManager = CenterLayoutManager(context, rowCount, orientation, isReverseLayout)
+            layoutManager.setMillisecondPerInch(scrollSpeed)
+            if (orientation == VERTICAL) {
+                increaseKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
+                decreaseKeyCode = KeyEvent.KEYCODE_DPAD_UP
+                increaseRowKeyCode = KeyEvent.KEYCODE_DPAD_RIGHT
+                decreaseRowKeyCode = KeyEvent.KEYCODE_DPAD_LEFT
+            }
 
-    }
+            super.setLayoutManager(layoutManager)
+            super.setOnFocusChangeListener(focusChangeListener)
 
-    override fun setAdapter(adapter: Adapter<*>?) {
-        setLayoutManager()
-        super.setAdapter(adapter)
-    }
-
-
-
-    override fun setOnFocusChangeListener(l: OnFocusChangeListener?) {
-        this.onRvfocusChangeListener = l
-    }
-
-
-    private var focusChangeListener = OnFocusChangeListener { view: View, focus: Boolean ->
-        callItemSelectable(selectedPos, focus, focus)
-        onRvfocusChangeListener?.onFocusChange(view, focus)
-    }
-
-    fun selectItem(pos: Int) {
-        selectItem(pos, focus = false, runAnimation = false)
-    }
-
-    fun selectItem(pos: Int, focus: Boolean, runAnimation: Boolean = true) {
-        smoothScrollToPosition(pos)
-        selectedPos = pos
-        doScroll(pos, focus, runAnimation)
-    }
-
-    fun doScroll(selectedPos: Int, focus: Boolean, runAnimation: Boolean = true) {
-
-        if (selectedPos != this.lastScrollSelectedPos) {
-            temp = true
-
-            callItemSelectable(lastScrollSelectedPos, false, focus, runAnimation)
-            callItemSelectable(selectedPos, true, focus, runAnimation)
-
-            onItemSelectedWithoutFocusListener?.onItemSelectedWithoutFocus(
-                selectedPos,
-                (adapter as BaseRVAdapter<*, *>).getItem(selectedPos),
-                findViewHolderForAdapterPosition(selectedPos),
-                adapter
-            )
-            this.lastScrollSelectedPos = selectedPos
-        } else {
-            callItemSelectable(selectedPos, true, focus, runAnimation)
         }
-    }
+
+        override fun setAdapter(adapter: Adapter<*>?) {
+            setLayoutManager()
+            super.setAdapter(adapter)
+        }
 
 
-    fun selectLastPosition() {
-        if (isFocused) callItemSelectable(selectedPos, selected = true, focus = true)
-    }
-
-    fun deSelect() {
-        callItemSelectable(selectedPos, selected = false, focus = false, runAnimation = isFocused)
-    }
+        override fun setOnFocusChangeListener(l: OnFocusChangeListener?) {
+            this.onRvfocusChangeListener = l
+        }
 
 
-    private fun callItemSelectable(
-        selectedPos: Int,
-        selected: Boolean,
-        focus: Boolean,
-        runAnimation: Boolean = true,
-        countCall: Int = 4
-    ) {
-        val holder = findViewHolderForAdapterPosition(selectedPos)
+        private var focusChangeListener = OnFocusChangeListener { view: View, focus: Boolean ->
+            callItemSelectable(selectedPos, focus, focus)
+            onRvfocusChangeListener?.onFocusChange(view, focus)
+        }
 
-        if (holder == null && countCall != 0) {
-            handleViewHolderNullPosition(selectedPos, selected, focus, runAnimation, countCall)
-        } else if (holder != null) {
-            if (runAnimation && useAnim) runAnimation(selected, holder.itemView)
-            if (focus) onItemSelectedListener?.onItemSelected(
+        fun selectItem(pos: Int) {
+            selectItem(pos, focus = false, runAnimation = false)
+        }
+
+        fun selectItem(pos: Int, focus: Boolean, runAnimation: Boolean = true) {
+            smoothScrollToPosition(pos)
+            selectedPos = pos
+            doScroll(pos, focus, runAnimation)
+        }
+
+        fun doScroll(selectedPos: Int, focus: Boolean, runAnimation: Boolean = true) {
+
+            if (selectedPos != this.lastScrollSelectedPos) {
+                temp = true
+
+                callItemSelectable(lastScrollSelectedPos, false, focus, runAnimation)
+                callItemSelectable(selectedPos, true, focus, runAnimation)
+
+                onItemSelectedWithoutFocusListener?.onItemSelectedWithoutFocus(
+                    selectedPos,
+                    (adapter as BaseRVAdapter<*, *>).getItem(selectedPos),
+                    findViewHolderForAdapterPosition(selectedPos),
+                    adapter
+                )
+                this.lastScrollSelectedPos = selectedPos
+            } else {
+                callItemSelectable(selectedPos, true, focus, runAnimation)
+            }
+        }
+
+
+        fun selectLastPosition() {
+            if (isFocused) callItemSelectable(selectedPos, selected = true, focus = true)
+        }
+
+        fun deSelect() {
+            callItemSelectable(
                 selectedPos,
-                if (adapter is BaseRVAdapter<*, *>) (adapter as BaseRVAdapter<*, *>).getItem(
-                    selectedPos
-                ) else null,
-                holder,
-                adapter
+                selected = false,
+                focus = false,
+                runAnimation = isFocused
             )
-            if (holder is ItemSelectable) {
-                (holder as ItemSelectable).changeSelected(
-                    selected,
-                    focus,
+        }
+
+
+        private fun callItemSelectable(
+            selectedPos: Int,
+            selected: Boolean,
+            focus: Boolean,
+            runAnimation: Boolean = true,
+            countCall: Int = 4
+        ) {
+            val holder = findViewHolderForAdapterPosition(selectedPos)
+
+            if (holder == null && countCall != 0) {
+                handleViewHolderNullPosition(selectedPos, selected, focus, runAnimation, countCall)
+            } else if (holder != null) {
+                if (runAnimation && useAnim) runAnimation(selected, holder.itemView)
+                if (focus) onItemSelectedListener?.onItemSelected(
                     selectedPos,
                     if (adapter is BaseRVAdapter<*, *>) (adapter as BaseRVAdapter<*, *>).getItem(
-                        lastScrollSelectedPos
-                    ) else null
+                        selectedPos
+                    ) else null,
+                    holder,
+                    adapter
                 )
+                if (holder is ItemSelectable) {
+                    (holder as ItemSelectable).changeSelected(
+                        selected,
+                        focus,
+                        selectedPos,
+                        if (adapter is BaseRVAdapter<*, *>) (adapter as BaseRVAdapter<*, *>).getItem(
+                            lastScrollSelectedPos
+                        ) else null
+                    )
+                }
             }
         }
-    }
 
-    private fun runAnimation(selected: Boolean, view: View) {
-        val anim = if (selected) AnimationUtils.loadAnimation(
-            context,
-            selectAnimation
-        ) else AnimationUtils.loadAnimation(context, unselectAnimation)
-        anim!!.fillAfter = true
-        view.startAnimation(anim)
-    }
+        private fun runAnimation(selected: Boolean, view: View) {
+            val anim = if (selected) AnimationUtils.loadAnimation(
+                context,
+                selectAnimation
+            ) else AnimationUtils.loadAnimation(context, unselectAnimation)
+            anim!!.fillAfter = true
+            view.startAnimation(anim)
+        }
 
-    private fun handleViewHolderNullPosition(
-        selectedPos: Int,
-        selected: Boolean,
-        focus: Boolean,
-        runAnimation: Boolean = true,
-        countCall: Int
-    ) {
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (!selected || selectedPos == this.selectedPos) {
-                callItemSelectable(selectedPos, selected, focus, runAnimation, countCall - 1)
-            }
-        }, 200)
-    }
+        private fun handleViewHolderNullPosition(
+            selectedPos: Int,
+            selected: Boolean,
+            focus: Boolean,
+            runAnimation: Boolean = true,
+            countCall: Int
+        ) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (!selected || selectedPos == this.selectedPos) {
+                    callItemSelectable(selectedPos, selected, focus, runAnimation, countCall - 1)
+                }
+            }, 200)
+        }
 
-}
+    }
