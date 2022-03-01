@@ -11,16 +11,17 @@ import io.reactivex.schedulers.Schedulers
 import ir.huma.tvrecyclerview.app.R
 import ir.huma.tvrecyclerview.app.data.APIService
 import ir.huma.tvrecyclerview.app.data.Repository
+import ir.huma.tvrecyclerview.app.holders.MovieHolder
 import ir.huma.tvrecyclerview.app.model.Movie
 import ir.huma.tvrecyclerview.lib.TvRecyclerView
 import ir.huma.tvrecyclerview.lib.adapter.BaseRVAdapter
-import ir.huma.tvrecyclerview.lib.listener.OnItemClickListener
+import ir.huma.tvrecyclerview.lib.interfaces.OnItemClickListener
 
 class VerticalRecyclerViewActivity : AppCompatActivity() {
     private val TAG = "VerticalRecyclerView"
     private lateinit var verticalRecyclerViewActivity: TvRecyclerView
     private lateinit var repository: Repository
-    private lateinit var moviesAdapter: BaseRVAdapter<Movie.MovieHolder, Movie>
+    private lateinit var moviesAdapter: BaseRVAdapter<MovieHolder, Movie>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vertical_recycler_view)
@@ -39,7 +40,7 @@ class VerticalRecyclerViewActivity : AppCompatActivity() {
         verticalRecyclerViewActivity = findViewById(R.id.vertical_recycler_view)
         moviesAdapter = BaseRVAdapter(
             this@VerticalRecyclerViewActivity,
-            Movie.MovieHolder::class.java,
+            MovieHolder::class.java,
             R.layout.item_vertical_recycler_view
         )
         verticalRecyclerViewActivity.adapter = moviesAdapter

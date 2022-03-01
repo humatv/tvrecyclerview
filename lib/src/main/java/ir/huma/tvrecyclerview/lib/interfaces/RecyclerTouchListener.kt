@@ -1,4 +1,4 @@
-package ir.huma.tvrecyclerview.lib.listener
+package ir.huma.tvrecyclerview.lib.interfaces
 
 import android.content.Context
 import android.view.GestureDetector
