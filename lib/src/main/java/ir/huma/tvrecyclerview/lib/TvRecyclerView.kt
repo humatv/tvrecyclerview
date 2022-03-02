@@ -12,8 +12,8 @@ import android.view.animation.AnimationUtils
 import android.widget.ScrollView
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
-import ir.huma.tvrecyclerview.lib.adapter.BaseRVAdapter
 import ir.huma.tvrecyclerview.lib.interfaces.*
+import ir.huma.tvrecyclerview.lib.interfaces.GetItemAdaptable
 
 class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     RecyclerView(context, attrs, defStyleAttr) {
@@ -43,6 +43,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         private set
     private var lastScrollSelectedPos = 0
     private var longPress = false
+
     @Volatile
     private var temp = false
     private var myOnKeyListener: OnKeyListener? = null
@@ -160,7 +161,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                                 if (onItemLongClickListener != null) {
                                     onItemLongClickListener?.onItemLongClick(
                                         selectedPos,
-                                        (adapter as BaseRVAdapter<*, *>).getItem(selectedPos),
+                                        (adapter as GetItemAdaptable<*>).getItem(selectedPos),
                                         findViewHolderForLayoutPosition(selectedPos),
                                         adapter
                                     )
@@ -169,7 +170,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                                 } else if (onItemClickListener != null) {
                                     onItemClickListener?.onItemClick(
                                         selectedPos,
-                                        (adapter as BaseRVAdapter<*, *>).getItem(selectedPos),
+                                        (adapter as GetItemAdaptable<*>).getItem(selectedPos),
                                         findViewHolderForLayoutPosition(selectedPos),
                                         adapter
                                     )
@@ -193,7 +194,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                         try {
                             onItemClickListener?.onItemClick(
                                 selectedPos,
-                                (adapter as BaseRVAdapter<*, *>).getItem(selectedPos),
+                                (adapter as GetItemAdaptable<*>).getItem(selectedPos),
                                 findViewHolderForLayoutPosition(selectedPos),
                                 adapter
                             )
@@ -233,7 +234,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                             doScroll(position, true)
                             if (onItemClickListener != null) onItemClickListener?.onItemClick(
                                 position,
-                                (adapter as BaseRVAdapter<*, *>).getItem(position),
+                                (adapter as GetItemAdaptable<*>).getItem(position),
                                 findViewHolderForLayoutPosition(selectedPos),
                                 adapter
                             )
@@ -251,13 +252,13 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                             doScroll(position, true)
                             if (onItemLongClickListener != null) onItemLongClickListener?.onItemLongClick(
                                 position,
-                                (adapter as BaseRVAdapter<*, *>).getItem(position),
+                                (adapter as GetItemAdaptable<*>).getItem(position),
                                 findViewHolderForLayoutPosition(selectedPos),
                                 adapter
                             )
                             else if (onItemClickListener != null) onItemClickListener?.onItemClick(
                                 position,
-                                (adapter as BaseRVAdapter<*, *>).getItem(position),
+                                (adapter as GetItemAdaptable<*>).getItem(position),
                                 findViewHolderForLayoutPosition(selectedPos),
                                 adapter
                             )
@@ -351,7 +352,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
             onItemSelectedWithoutFocusListener?.onItemSelectedWithoutFocus(
                 selectedPos,
-                (adapter as BaseRVAdapter<*, *>).getItem(selectedPos),
+                (adapter as GetItemAdaptable<*>).getItem(selectedPos),
                 findViewHolderForAdapterPosition(selectedPos),
                 adapter
             )
@@ -391,7 +392,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
             if (runAnimation && useAnim) runAnimation(selected, holder.itemView)
             if (focus) onItemSelectedListener?.onItemSelected(
                 selectedPos,
-                if (adapter is BaseRVAdapter<*, *>) (adapter as BaseRVAdapter<*, *>).getItem(
+                if (adapter is GetItemAdaptable<*>) (adapter as GetItemAdaptable<*>).getItem(
                     selectedPos
                 ) else null,
                 holder,
@@ -402,7 +403,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                     selected,
                     focus,
                     selectedPos,
-                    if (adapter is BaseRVAdapter<*, *>) (adapter as BaseRVAdapter<*, *>).getItem(
+                    if (adapter is GetItemAdaptable<*>) (adapter as GetItemAdaptable<*>).getItem(
                         selectedPos
                     ) else null
                 )

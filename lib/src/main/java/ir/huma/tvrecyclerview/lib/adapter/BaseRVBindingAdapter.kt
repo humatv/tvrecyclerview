@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.databinding.ViewDataBinding
 import androidx.databinding.DataBindingUtil
+import ir.huma.tvrecyclerview.lib.interfaces.Adaptable
+import ir.huma.tvrecyclerview.lib.interfaces.GetItemAdaptable
 import java.util.*
 
 /**
@@ -16,7 +18,7 @@ class BaseRVBindingAdapter<T : BaseRVBindingHolder<MODEL>, MODEL>(
     private val holder: Class<T>,
     val items: ArrayList<MODEL>,
     private vararg val layout: Int
-) : RecyclerView.Adapter<BaseRVBindingHolder<MODEL>>() {
+) : RecyclerView.Adapter<BaseRVBindingHolder<MODEL>>(),Adaptable<MODEL> {
 
     var objects: Array<Any>? = null
         private set
@@ -45,7 +47,7 @@ class BaseRVBindingAdapter<T : BaseRVBindingHolder<MODEL>, MODEL>(
 
     }
 
-    fun getItem(position: Int): MODEL? {
+    override fun getItem(position: Int): MODEL? {
         return if (position < items.size) items[position] else null
     }
 
@@ -61,11 +63,11 @@ class BaseRVBindingAdapter<T : BaseRVBindingHolder<MODEL>, MODEL>(
         return items.size
     }
 
-    fun setObjects(vararg args: Any) {
+    override fun setObjects(vararg args: Any) {
         objects = arrayOf(args)
     }
 
-    fun removeItem(model: MODEL): Boolean {
+    override fun removeItem(model: MODEL): Boolean {
         val index = items.indexOf(model)
         if (index != -1) {
             items.remove(model)
@@ -75,7 +77,7 @@ class BaseRVBindingAdapter<T : BaseRVBindingHolder<MODEL>, MODEL>(
         return false
     }
 
-    fun removeItem(pos: Int): MODEL? {
+    override fun removeItem(pos: Int): MODEL? {
         if (pos < items.size) {
             val m = items.removeAt(pos)
             notifyItemRemoved(pos)
@@ -84,17 +86,17 @@ class BaseRVBindingAdapter<T : BaseRVBindingHolder<MODEL>, MODEL>(
         return null
     }
 
-    fun addItem(model: MODEL) {
+    override fun addItem(model: MODEL) {
         items.add(model)
         notifyItemInserted(items.size - 1)
     }
 
-    fun addItem(model: MODEL, position: Int) {
+    override fun addItem(model: MODEL, position: Int) {
         items.add(position, model)
         notifyItemInserted(position - 1)
     }
 
-    fun updateItem(model: MODEL): Boolean {
+    override fun updateItem(model: MODEL): Boolean {
         var index: Int
         if (items.indexOf(model).also { index = it } != -1) {
             updateItem(model, index)
@@ -103,7 +105,7 @@ class BaseRVBindingAdapter<T : BaseRVBindingHolder<MODEL>, MODEL>(
         return false
     }
 
-    fun updateItem(model: MODEL, pos: Int) {
+    override fun updateItem(model: MODEL, pos: Int) {
         if (pos > items.size) {
             items.add(model)
         } else {
@@ -113,30 +115,30 @@ class BaseRVBindingAdapter<T : BaseRVBindingHolder<MODEL>, MODEL>(
         notifyItemChanged(pos)
     }
 
-    fun removeAll() {
+    override fun removeAll() {
         val size = items.size
         items.clear()
         notifyItemRangeRemoved(0,size)
     }
 
-    fun addAll(list: List<MODEL>) {
+    override fun addAll(list: List<MODEL>) {
         val size = items.size
         items.addAll(list)
         notifyItemRangeInserted(size, list.size)
     }
 
-    fun addAll(vararg list: MODEL) {
+    override fun addAll(vararg list: MODEL) {
         val size = items.size
         items.addAll(listOf(*list))
         notifyItemRangeInserted(size, list.size)
     }
 
-    fun addAll(pos: Int, list: List<MODEL>) {
+    override fun addAll(pos: Int, list: List<MODEL>) {
         items.addAll(pos, list)
         notifyItemRangeInserted(pos, list.size)
     }
 
-    fun addAll(pos: Int, vararg list: MODEL) {
+    override fun addAll(pos: Int, vararg list: MODEL) {
         items.addAll(pos, listOf(*list))
         notifyItemRangeInserted(pos, list.size)
     }
