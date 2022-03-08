@@ -3,8 +3,6 @@ package ir.huma.tvrecyclerview.lib.interfaces
 interface Adaptable<MODEL> :
     GetItemAdaptable<MODEL> {
 
-    fun setObjects(vararg args: Any)
-
     fun removeItem(model: MODEL): Boolean
 
     fun removeItem(pos: Int): MODEL?
