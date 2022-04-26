@@ -97,39 +97,22 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         try {
             if (event?.action == KeyEvent.ACTION_DOWN) {
                 if (event.keyCode == increaseKeyCode) {
-                    if (!isLTR) {
-                        if (selectedPos - rowCount >= 0) {
-                            playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
-                            selectedPos -= rowCount
-                            smoothScrollToPosition(selectedPos)
-                            doScroll(selectedPos, true)
-                            temp = true
-                            return true
-                        }
-                    } else {
-                        if (selectedPos + rowCount < adapter!!.itemCount) {
-                            playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
-                            selectedPos += rowCount
-                            smoothScrollToPosition(selectedPos)
-                            doScroll(selectedPos, true)
-                            temp = true
-                            return true
-                        }
+                    if (orientation == VERTICAL && super.dispatchKeyEvent(event)) {
+                        return true
                     }
-                } else if (event.keyCode == decreaseKeyCode) {
                     if (!isLTR) {
-                        if (selectedPos + rowCount < adapter!!.itemCount) {
-                            playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
-                            selectedPos += rowCount
+                        if (selectedPos - rowCount >= 0) {
+                            playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
+                            selectedPos -= rowCount
                             smoothScrollToPosition(selectedPos)
                             doScroll(selectedPos, true)
                             temp = true
                             return true
                         }
                     } else {
-                        if (selectedPos - rowCount >= 0) {
-                            playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
-                            selectedPos -= rowCount
+                        if (selectedPos + rowCount < adapter!!.itemCount) {
+                            playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
+                            selectedPos += rowCount
                             smoothScrollToPosition(selectedPos)
                             doScroll(selectedPos, true)
                             temp = true
@@ -137,6 +120,29 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                         }
                     }
 
+                } else if (event.keyCode == decreaseKeyCode) {
+                    if (orientation == VERTICAL && super.dispatchKeyEvent(event)) {
+                        return true
+                    }
+                    if (!isLTR) {
+                        if (selectedPos + rowCount < adapter!!.itemCount) {
+                            playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
+                            selectedPos += rowCount
+                            smoothScrollToPosition(selectedPos)
+                            doScroll(selectedPos, true)
+                            temp = true
+                            return true
+                        }
+                    } else {
+                        if (selectedPos - rowCount >= 0) {
+                            playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
+                            selectedPos -= rowCount
+                            smoothScrollToPosition(selectedPos)
+                            doScroll(selectedPos, true)
+                            temp = true
+                            return true
+                        }
+                    }
                 } else if (event.keyCode == increaseRowKeyCode) {
                     if ((selectedPos + 1) % rowCount != 0 && selectedPos + 1 < adapter!!.itemCount) {
                         playSoundEffect(SoundEffectConstants.NAVIGATION_DOWN)
@@ -307,8 +313,8 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         if (orientation == VERTICAL) {
             increaseKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
             decreaseKeyCode = KeyEvent.KEYCODE_DPAD_UP
-            increaseRowKeyCode = KeyEvent.KEYCODE_DPAD_RIGHT
-            decreaseRowKeyCode = KeyEvent.KEYCODE_DPAD_LEFT
+            increaseRowKeyCode = KeyEvent.KEYCODE_DPAD_LEFT
+            decreaseRowKeyCode = KeyEvent.KEYCODE_DPAD_RIGHT
         }
 
         super.setLayoutManager(layoutManager)
@@ -328,6 +334,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
 
     private var focusChangeListener = OnFocusChangeListener { view: View, focus: Boolean ->
+        Log.d(TAG, "focusChangeListener: ${orientation}  ${focus}")
         callItemSelectable(selectedPos, focus, focus)
         onRvfocusChangeListener?.onFocusChange(view, focus)
     }

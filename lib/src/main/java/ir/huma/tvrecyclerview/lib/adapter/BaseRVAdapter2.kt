@@ -4,11 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import ir.huma.tvrecyclerview.lib.interfaces.Adaptable
-import ir.huma.tvrecyclerview.lib.interfaces.GetItemAdaptable
-import ir.huma.tvrecyclerview.lib.interfaces.ViewTypeHandler
-import java.util.HashMap
 
 /**
  * Created by hamedgramzi on 2022-03-01.
@@ -58,6 +53,10 @@ class BaseRVAdapter2<MODEL>() : AbstractBaseRVAdapter<MODEL>() {
 
     override fun onBindViewHolder(holder: BaseRVHolder<MODEL>, position: Int) {
         holder.fill(items[position], position, getItemViewType(position))
+    }
+
+    fun notifyInnerItemChanged(rowPosition: Int,position: Int) {
+
     }
 
 }
