@@ -26,9 +26,9 @@ class BaseRVBindingAdapter2<MODEL>() :
         inline fun <reified MODEL> create(
             context: Context,
             items: ArrayList<MODEL> = ArrayList()
-        ): BaseRVAdapter2<MODEL> {
+        ): BaseRVBindingAdapter2<MODEL> {
 
-            var adapter = BaseRVAdapter2<MODEL>()
+            var adapter = BaseRVBindingAdapter2<MODEL>()
             adapter.context = context
             adapter.items.addAll(items)
             var holder =
