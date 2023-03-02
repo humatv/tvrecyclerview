@@ -24,7 +24,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     var onItemSelectedListener: OnItemSelectedListener? = null
     var onItemSelectedWithoutFocusListener: OnItemSelectedWithoutFocusListener? = null
     var onRvfocusChangeListener: OnFocusChangeListener? = null
-
+    var myOnKeyListener: OnKeyListener? = null
     var scrollSpeed = 35f //(bigger = slower)
     var useAnim = false
         set(value) {
@@ -46,7 +46,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
     @Volatile
     private var temp = false
-    private var myOnKeyListener: OnKeyListener? = null
+
     private var increaseKeyCode = KeyEvent.KEYCODE_DPAD_RIGHT
     private var decreaseKeyCode = KeyEvent.KEYCODE_DPAD_LEFT
     private var increaseRowKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
