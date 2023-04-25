@@ -69,7 +69,7 @@ abstract class AbstractBaseRVAdapter<MODEL>() : RecyclerView.Adapter<BaseRVHolde
 
     override fun addItem(model: MODEL, position: Int) {
         items.add(position, model)
-        notifyItemInserted(position - 1)
+        notifyItemInserted(position)
     }
 
     override fun updateItem(model: MODEL): Boolean {
