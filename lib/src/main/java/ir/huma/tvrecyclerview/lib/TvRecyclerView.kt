@@ -313,8 +313,13 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         if (orientation == VERTICAL) {
             increaseKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
             decreaseKeyCode = KeyEvent.KEYCODE_DPAD_UP
-            increaseRowKeyCode = KeyEvent.KEYCODE_DPAD_LEFT
-            decreaseRowKeyCode = KeyEvent.KEYCODE_DPAD_RIGHT
+            if (isLTR) {
+                increaseRowKeyCode = KeyEvent.KEYCODE_DPAD_RIGHT
+                decreaseRowKeyCode = KeyEvent.KEYCODE_DPAD_LEFT
+            } else {
+                increaseRowKeyCode = KeyEvent.KEYCODE_DPAD_LEFT
+                decreaseRowKeyCode = KeyEvent.KEYCODE_DPAD_RIGHT
+            }
         }
 
         super.setLayoutManager(layoutManager)
