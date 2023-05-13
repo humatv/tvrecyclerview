@@ -311,8 +311,13 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         val layoutManager = CenterLayoutManager(context, rowCount, orientation, isReverseLayout)
         layoutManager.setMillisecondPerInch(scrollSpeed)
         if (orientation == VERTICAL) {
-            increaseKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
-            decreaseKeyCode = KeyEvent.KEYCODE_DPAD_UP
+            if(isReverseLayout) {
+                increaseKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
+                decreaseKeyCode = KeyEvent.KEYCODE_DPAD_UP
+            } else{
+                increaseKeyCode = KeyEvent.KEYCODE_DPAD_UP
+                decreaseKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
+            }
             if (isLTR) {
                 increaseRowKeyCode = KeyEvent.KEYCODE_DPAD_RIGHT
                 decreaseRowKeyCode = KeyEvent.KEYCODE_DPAD_LEFT
