@@ -100,7 +100,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                     if (orientation == VERTICAL && super.dispatchKeyEvent(event)) {
                         return true
                     }
-                    if (!isLTR) {
+                    if (!isLTR && orientation == HORIZONTAL) {
                         if (selectedPos - rowCount >= 0) {
                             playSoundEffect(SoundEffectConstants.NAVIGATION_RIGHT)
                             selectedPos -= rowCount
@@ -124,7 +124,7 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                     if (orientation == VERTICAL && super.dispatchKeyEvent(event)) {
                         return true
                     }
-                    if (!isLTR) {
+                    if (!isLTR && orientation == HORIZONTAL) {
                         if (selectedPos + rowCount < adapter!!.itemCount) {
                             playSoundEffect(SoundEffectConstants.NAVIGATION_LEFT)
                             selectedPos += rowCount
