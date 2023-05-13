@@ -312,11 +312,11 @@ class TvRecyclerView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         layoutManager.setMillisecondPerInch(scrollSpeed)
         if (orientation == VERTICAL) {
             if(isReverseLayout) {
-                increaseKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
-                decreaseKeyCode = KeyEvent.KEYCODE_DPAD_UP
-            } else{
                 increaseKeyCode = KeyEvent.KEYCODE_DPAD_UP
                 decreaseKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
+            } else{
+                increaseKeyCode = KeyEvent.KEYCODE_DPAD_DOWN
+                decreaseKeyCode = KeyEvent.KEYCODE_DPAD_UP
             }
             if (isLTR) {
                 increaseRowKeyCode = KeyEvent.KEYCODE_DPAD_RIGHT
